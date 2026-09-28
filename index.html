@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts for Kids -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Mali:wght@600;700&display=swap" rel="stylesheet">
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -23,8 +23,7 @@
                         bubblegum: '#FF4081',
                         sky: '#40C4FF',
                         limey: '#69F0AE',
-                        purplepop: '#E040FB',
-                        cookie: '#FF9100'
+                        purplepop: '#E040FB'
                     },
                     fontFamily: {
                         kids: ['"Fredoka One"', 'cursive', 'sans-serif'],
@@ -61,15 +60,14 @@
 
         .kid-card {
             perspective: 1000px;
-            width: 100px;
-            height: 140px;
-            transition: transform 0.3s ease;
+            width: 95px;
+            height: 135px;
         }
 
         @media (min-width: 640px) {
             .kid-card {
-                width: 130px;
-                height: 180px;
+                width: 125px;
+                height: 175px;
             }
         }
 
@@ -111,11 +109,11 @@
 
         @keyframes float-star {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(12deg); }
+            50% { transform: translateY(-8px) rotate(10deg); }
         }
 
         .floating-star {
-            animation: float-star 2.8s infinite ease-in-out;
+            animation: float-star 2.5s infinite ease-in-out;
         }
 
         @keyframes wobble {
@@ -124,24 +122,15 @@
         }
 
         .wobbly {
-            animation: wobble 2.2s infinite ease-in-out;
-        }
-
-        .rainbow-text {
-            background: linear-gradient(to right, #FF5252, #FFD54F, #69F0AE, #40C4FF, #E040FB);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            animation: wobble 2s infinite ease-in-out;
         }
     </style>
 </head>
 <body class="flex flex-col justify-between p-3 sm:p-5 text-white min-h-screen">
 
-    <!-- TOP HEADER BAR -->
     <header class="w-full max-w-5xl mx-auto flex items-center justify-between gap-2 p-3 bg-white/20 backdrop-blur-md rounded-3xl border-4 border-white/60 shadow-xl">
-        
-        <!-- Game Title & Character Avatar -->
         <div class="flex items-center gap-2 sm:gap-3">
-            <button onclick="cycleAvatar()" class="w-12 h-12 rounded-2xl bg-sunshine flex items-center justify-center text-3xl shadow-inner border-2 border-white wobbly bounce-btn" title="Click to change dealer!">
+            <button onclick="cycleAvatar()" class="w-12 h-12 rounded-2xl bg-sunshine flex items-center justify-center text-3xl shadow-inner border-2 border-white wobbly bounce-btn" title="Click to change dealer avatar!">
                 <span id="current-avatar-emoji">🐻</span>
             </button>
             <div>
@@ -150,22 +139,25 @@
             </div>
         </div>
 
-        <!-- Magic Cookie Tokens Display -->
-        <div class="flex items-center gap-2 bg-amber-400 text-purple-950 px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl border-4 border-white shadow-md">
-            <span class="text-xl sm:text-2xl floating-star">⭐</span>
-            <div>
-                <span class="text-[9px] sm:text-[10px] uppercase font-bold block leading-none text-purple-950">Stars</span>
-                <span id="star-count" class="text-xl sm:text-2xl font-black leading-none">10</span>
-            </div>
+        <!-- Dynamic API / Audio Status Badge -->
+        <div id="audio-status-badge" class="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-white/30 rounded-full border border-white/60 text-[11px] font-friendly font-bold">
+            <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-limey"></span>
+            <span id="status-text">Native Speech Active</span>
         </div>
 
-        <!-- Settings Gear Button -->
-        <button onclick="openSettingsModal()" class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-purplepop hover:bg-purple-600 border-4 border-white flex items-center justify-center text-white text-lg sm:text-xl bounce-btn shadow-lg" title="Voice & Settings">
-            <i class="fas fa-gear"></i>
-        </button>
+        <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 bg-amber-400 text-purple-950 px-3 py-1.5 rounded-2xl border-4 border-white shadow-md">
+                <span class="text-xl floating-star">⭐</span>
+                <span id="star-count" class="text-xl font-black">10</span>
+            </div>
+
+            <!-- Settings Gear Button -->
+            <button onclick="openSettingsModal()" class="w-11 h-11 rounded-2xl bg-purplepop hover:bg-purple-600 border-4 border-white flex items-center justify-center text-white text-lg bounce-btn shadow-lg" title="Voice & API Settings">
+                <i class="fas fa-gear"></i>
+            </button>
+        </div>
     </header>
 
-    <!-- SETTINGS MODAL -->
     <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 p-4">
         <div class="bg-gradient-to-b from-sky to-purplepop border-4 border-white rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl text-white relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeSettingsModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-playpen border-2 border-white text-white font-bold text-lg flex items-center justify-center bounce-btn">
@@ -175,39 +167,43 @@
             <div class="flex items-center gap-3 mb-4">
                 <span class="text-3xl">🔊</span>
                 <div>
-                    <h3 class="text-xl sm:text-2xl font-black text-sunshine">Voice & API Settings</h3>
-                    <p class="text-xs text-white/90 font-friendly">Choose native voice, Fish.Audio, or ElevenLabs!</p>
+                    <h3 class="text-xl sm:text-2xl font-black text-sunshine">Voice & API Setup</h3>
+                    <p class="text-xs text-white/90 font-friendly">Configure natural voice APIs for the dealer!</p>
                 </div>
             </div>
 
+            <!-- Status Alert Container in Settings -->
+            <div id="modal-alert-box" class="hidden mb-3 p-3 rounded-2xl bg-playpen/90 text-white border-2 border-white text-xs font-friendly font-bold leading-tight flex items-start gap-2">
+                <i class="fas fa-circle-exclamation text-base mt-0.5"></i>
+                <span id="modal-alert-msg">API Error occurred.</span>
+            </div>
+
             <div class="space-y-4 font-friendly font-bold text-xs sm:text-sm">
-                <!-- Voice Provider Selector -->
                 <div>
-                    <label class="block mb-1 text-sunshine text-xs uppercase">Voice Engine Provider</label>
+                    <label class="block mb-1 text-sunshine uppercase text-[11px]">Voice Engine Provider</label>
                     <select id="voice-provider-select" onchange="toggleProviderSections()" class="w-full p-3 rounded-2xl bg-white text-purple-900 font-bold border-2 border-yellow-300 focus:outline-none">
                         <option value="web">🗣️ Browser Native Speech (Free & Built-in)</option>
-                        <option value="fish">🐟 Fish.Audio API (Natural Voices)</option>
-                        <option value="elevenlabs">🎙️ ElevenLabs API (Realistic Expressive Voices)</option>
+                        <option value="elevenlabs">🎙️ ElevenLabs API (Ultra-Realistic)</option>
+                        <option value="fish">🐟 Fish.Audio API (Natural Neural TTS)</option>
                     </select>
                 </div>
 
-                <!-- Fish.Audio Section -->
-                <div id="fish-section" class="hidden space-y-2 p-3 bg-white/20 rounded-2xl border-2 border-white">
-                    <label class="block text-[11px] uppercase text-sunshine">Fish.Audio API Key</label>
-                    <input type="password" id="fish-key" placeholder="Paste Fish.Audio API Key" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
+                <!-- ElevenLabs Configuration Section -->
+                <div id="eleven-section" class="hidden space-y-2 p-3 bg-white/20 rounded-2xl border-2 border-white">
+                    <label class="block text-[11px] uppercase text-sunshine">ElevenLabs API Key (`xi-api-key`)</label>
+                    <input type="password" id="eleven-key" placeholder="e.g. sk_12345..." class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
                     
-                    <label class="block text-[11px] uppercase text-sunshine">Voice / Model ID (Optional)</label>
-                    <input type="text" id="fish-voice" placeholder="e.g. 7f92f8afb8ec43bf81429cc1c9199cb1" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
+                    <label class="block text-[11px] uppercase text-sunshine">Voice ID (Optional)</label>
+                    <input type="text" id="eleven-voice" placeholder="e.g. 21m00Tcm4TlvDq8ikWAM (Rachel default)" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
                 </div>
 
-                <!-- ElevenLabs Section -->
-                <div id="eleven-section" class="hidden space-y-2 p-3 bg-white/20 rounded-2xl border-2 border-white">
-                    <label class="block text-[11px] uppercase text-sunshine">ElevenLabs API Key</label>
-                    <input type="password" id="eleven-key" placeholder="Paste ElevenLabs API Key" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
+                <!-- Fish.Audio Configuration Section -->
+                <div id="fish-section" class="hidden space-y-2 p-3 bg-white/20 rounded-2xl border-2 border-white">
+                    <label class="block text-[11px] uppercase text-sunshine">Fish.Audio API Key (Bearer Token)</label>
+                    <input type="password" id="fish-key" placeholder="e.g. 8a7b6c..." class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
                     
-                    <label class="block text-[11px] uppercase text-sunshine">Voice ID</label>
-                    <input type="text" id="eleven-voice" placeholder="e.g. 21m00Tcm4TlvDq8ikWAM (Rachel/Custom)" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
-                    <p class="text-[10px] text-white/80">Default voice preset loaded if left blank.</p>
+                    <label class="block text-[11px] uppercase text-sunshine">Voice / Reference ID (Optional)</label>
+                    <input type="text" id="fish-voice" placeholder="e.g. 7f92f8afb8ec43bf81429cc1c9199cb1" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
                 </div>
 
                 <div class="pt-2 flex gap-2">
@@ -222,13 +218,12 @@
         </div>
     </div>
 
-    <!-- PLAY AREA -->
-    <main class="w-full max-w-4xl mx-auto my-2 sm:my-4 flex-1 flex flex-col justify-between p-3 sm:p-5 bg-white/25 backdrop-blur-md rounded-3xl border-4 border-white/60 shadow-2xl relative min-h-[460px]">
+    <main class="w-full max-w-4xl mx-auto my-2 sm:my-4 flex-1 flex flex-col justify-between p-3 sm:p-5 bg-white/25 backdrop-blur-md rounded-3xl border-4 border-white/60 shadow-2xl relative min-h-[450px]">
         
         <!-- Speech Bubble -->
-        <div id="speech-bubble" class="absolute top-2 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-sunshine text-purple-950 font-bold text-xs sm:text-sm border-4 border-white shadow-lg transition-all duration-300 opacity-0 pointer-events-none z-30 flex items-center gap-2">
+        <div id="speech-bubble" class="absolute top-2 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-sunshine text-purple-950 font-bold text-xs sm:text-sm border-4 border-white shadow-lg transition-all duration-300 opacity-0 pointer-events-none z-30 flex items-center gap-2 max-w-[90%] text-center">
             <span>💬</span>
-            <span id="speech-bubble-text">"Say HIT or STAY!"</span>
+            <span id="speech-bubble-text">"Say CARD or STAY!"</span>
         </div>
 
         <!-- DEALER SECTION -->
@@ -241,16 +236,12 @@
                 <span id="dealer-score" class="px-3 py-0.5 bg-white text-purple-900 rounded-full font-black text-xs border-2 border-yellow-300 shadow hidden">0</span>
             </div>
 
-            <!-- Dealer Cards -->
-            <div id="dealer-cards" class="flex justify-center items-center gap-2 py-2 min-h-[140px]">
-                <!-- Dynamic Cards -->
-            </div>
+            <!-- Dealer Cards Container -->
+            <div id="dealer-cards" class="flex justify-center items-center gap-2 py-2 min-h-[140px]"></div>
         </section>
 
-        <!-- CENTER MESSAGE BANNER & MATH EQUATION HELPER -->
+        <!-- CENTER MATH HELPER & BANNER -->
         <div class="relative my-1 flex flex-col items-center justify-center text-center">
-            
-            <!-- Visual Math Helper Box -->
             <div id="math-helper" class="mb-2 px-4 py-1.5 bg-white/90 text-purple-950 rounded-full font-black text-xs sm:text-sm border-2 border-purple-300 shadow flex items-center gap-2">
                 <span>🧮 Math Helper:</span>
                 <span id="math-equation-text" class="text-purple-700">0 = 0</span>
@@ -258,16 +249,14 @@
 
             <div id="game-banner" class="p-3 sm:p-4 rounded-3xl bg-sunshine text-purple-950 border-4 border-white shadow-2xl transition-all duration-300 scale-90 opacity-0 pointer-events-none max-w-sm w-full z-20">
                 <h2 id="banner-title" class="text-xl sm:text-3xl font-black uppercase">21! PERFECT MATH! ⭐</h2>
-                <p id="banner-subtitle" class="text-xs sm:text-sm font-friendly font-bold mt-1 text-purple-900">You scored exactly 21!</p>
+                <p id="banner-subtitle" class="text-xs sm:text-sm font-friendly font-bold mt-1 text-purple-900">Target score reached!</p>
             </div>
         </div>
 
         <!-- PLAYER SECTION -->
         <section class="flex flex-col items-center justify-end gap-1">
-            <!-- Player Cards -->
-            <div id="player-cards" class="flex justify-center items-center gap-2 py-2 min-h-[140px]">
-                <!-- Dynamic Cards -->
-            </div>
+            <!-- Player Cards Container -->
+            <div id="player-cards" class="flex justify-center items-center gap-2 py-2 min-h-[140px]"></div>
 
             <div class="flex items-center gap-2">
                 <span class="text-sm sm:text-base font-black text-sunshine drop-shadow">Your Magic Hand</span>
@@ -276,9 +265,7 @@
         </section>
     </main>
 
-    <!-- BOTTOM CONTROLS & VOICE BUTTON -->
     <footer class="w-full max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-white/20 backdrop-blur-md rounded-3xl border-4 border-white/50 shadow-xl">
-        
         <!-- Microphone Toggle -->
         <button id="mic-btn" onclick="toggleVoiceRecognition()" class="w-full sm:w-auto px-4 py-3 rounded-2xl bg-playpen hover:bg-red-500 border-4 border-white flex items-center justify-center gap-3 bounce-btn text-white shadow-lg">
             <i id="mic-icon" class="fas fa-microphone text-xl sm:text-2xl"></i>
@@ -288,7 +275,7 @@
             </div>
         </button>
 
-        <!-- Action Controls -->
+        <!-- Controls -->
         <div id="game-controls" class="flex items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto">
             <button id="btn-hit" onclick="playerHit()" class="flex-1 sm:flex-none px-4 sm:px-6 py-3.5 rounded-2xl bg-limey text-purple-950 font-black text-sm sm:text-base border-4 border-white bounce-btn shadow-lg flex items-center justify-center gap-1.5">
                 <span>➕</span> CARD / HIT
@@ -303,7 +290,6 @@
     </footer>
 
     <script>
-        /* SOUND EFFECTS SYNTHESIZER */
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
         function playKidSound(type) {
@@ -323,7 +309,7 @@
                 osc.start(now);
                 osc.stop(now + 0.08);
             } else if (type === 'win') {
-                confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+                confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
                 [392, 523, 659, 783, 1046].forEach((freq, i) => {
                     const o = audioCtx.createOscillator();
                     const g = audioCtx.createGain();
@@ -351,7 +337,6 @@
             }
         }
 
-        /* DEALER AVATARS */
         const DEALER_AVATARS = [
             { name: "Barnaby Bear", emoji: "🐻" },
             { name: "Sparky Dragon", emoji: "🐲" },
@@ -362,7 +347,7 @@
         function cycleAvatar() {
             avatarIndex = (avatarIndex + 1) % DEALER_AVATARS.length;
             updateAvatarUI();
-            speakDealerText("Hi! I am " + DEALER_AVATARS[avatarIndex].name + "! Let's play math 21!");
+            speakDealerText("Hi! I am " + DEALER_AVATARS[avatarIndex].name + "! Let's count to 21!");
         }
 
         function updateAvatarUI() {
@@ -373,15 +358,12 @@
             document.getElementById('dealer-name-label').textContent = current.name;
         }
 
-        /* SPEECH PROVIDERS & VOICE SETTINGS */
         let activeProvider = 'web';
         let fishApiKey = '';
         let fishVoiceId = '';
         let elevenApiKey = '';
         let elevenVoiceId = '';
-        let speechEnabled = true;
-        let isListening = false;
-        let recognition = null;
+        let currentAudio = null;
         const synth = window.speechSynthesis;
 
         function loadSavedSettings() {
@@ -398,6 +380,7 @@
             document.getElementById('eleven-voice').value = elevenVoiceId;
 
             toggleProviderSections();
+            updateStatusBadge();
         }
 
         function saveVoiceSettings() {
@@ -413,8 +396,10 @@
             localStorage.setItem('m21_eleven_key', elevenApiKey);
             localStorage.setItem('m21_eleven_voice', elevenVoiceId);
 
+            clearModalAlert();
+            updateStatusBadge();
             closeSettingsModal();
-            speakDealerText("Settings saved! Ready to count to 21!");
+            speakDealerText("Settings saved! Ready to play math 21!");
         }
 
         function toggleProviderSections() {
@@ -424,6 +409,7 @@
         }
 
         function openSettingsModal() {
+            clearModalAlert();
             const modal = document.getElementById('settings-modal');
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.classList.add('opacity-100');
@@ -435,78 +421,165 @@
             modal.classList.remove('opacity-100');
         }
 
-        function testVoice() {
-            saveVoiceSettings();
-            speakDealerText("Hello friend! Let's reach magic 21!");
+        function showModalAlert(msg) {
+            const box = document.getElementById('modal-alert-box');
+            document.getElementById('modal-alert-msg').textContent = msg;
+            box.classList.remove('hidden');
+        }
+
+        function clearModalAlert() {
+            document.getElementById('modal-alert-box').classList.add('hidden');
+        }
+
+        function updateStatusBadge(isError = false, errMsg = '') {
+            const dot = document.getElementById('status-dot');
+            const txt = document.getElementById('status-text');
+
+            if (isError) {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-playpen animate-pulse";
+                txt.textContent = "API Fallback (Native Active)";
+                return;
+            }
+
+            dot.className = "w-2.5 h-2.5 rounded-full bg-limey";
+            if (activeProvider === 'elevenlabs') txt.textContent = "ElevenLabs Active";
+            else if (activeProvider === 'fish') txt.textContent = "Fish.Audio Active";
+            else txt.textContent = "Native Speech Active";
         }
 
         function speakWebSpeech(text) {
             if (!synth) return;
             synth.cancel();
             const utt = new SpeechSynthesisUtterance(text);
-            utt.pitch = 1.3;
-            utt.rate = 0.95;
+            utt.pitch = 1.2;
+            utt.rate = 1.0;
             synth.speak(utt);
         }
 
         async function speakDealerText(text) {
-            if (!speechEnabled) return;
             showSpeechBubble(text);
 
-            if (activeProvider === 'fish' && fishApiKey) {
-                try {
-                    const res = await fetch('https://api.fish.audio/v1/tts', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + fishApiKey,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            text: text,
-                            reference_id: fishVoiceId || '7f92f8afb8ec43bf81429cc1c9199cb1',
-                            format: 'mp3'
-                        })
-                    });
-                    if (!res.ok) throw new Error("Fish Audio API Error");
-                    const blob = await res.blob();
-                    const audio = new Audio(URL.createObjectURL(blob));
-                    audio.play();
-                    return;
-                } catch (e) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+
+            // ELEVENLABS AUDIO SYNTHESIS
+            if (activeProvider === 'elevenlabs') {
+                if (!elevenApiKey) {
+                    showModalAlert("ElevenLabs API Key is missing!");
+                    updateStatusBadge(true);
                     speakWebSpeech(text);
                     return;
                 }
-            } else if (activeProvider === 'elevenlabs' && elevenApiKey) {
+
+                const voiceId = elevenVoiceId || '21m00Tcm4TlvDq8ikWAM';
+                const endpoint = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
+
                 try {
-                    const vid = elevenVoiceId || '21m00Tcm4TlvDq8ikWAM'; // Rachel default
-                    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${vid}`, {
+                    const response = await fetch(endpoint, {
                         method: 'POST',
                         headers: {
-                            'xi-api-key': elevenApiKey,
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'xi-api-key': elevenApiKey
                         },
                         body: JSON.stringify({
                             text: text,
-                            model_id: "eleven_monolingual_v1",
-                            voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+                            model_id: "eleven_monolingual_v1"
                         })
                     });
-                    if (!res.ok) throw new Error("ElevenLabs API Error");
-                    const blob = await res.blob();
-                    const audio = new Audio(URL.createObjectURL(blob));
-                    audio.play();
+
+                    if (!response.ok) {
+                        const errData = await response.json().catch(() => ({}));
+                        const msg = errData.detail?.message || `ElevenLabs Error HTTP ${response.status}`;
+                        showModalAlert(msg);
+                        updateStatusBadge(true);
+                        speakWebSpeech(text);
+                        return;
+                    }
+
+                    const arrayBuffer = await response.arrayBuffer();
+                    const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
+                    const url = URL.createObjectURL(blob);
+                    currentAudio = new Audio(url);
+                    currentAudio.play();
+                    updateStatusBadge(false);
                     return;
-                } catch (e) {
+                } catch (err) {
+                    console.error("ElevenLabs Fetch Exception:", err);
+                    showModalAlert("ElevenLabs Network / CORS Error: " + err.message);
+                    updateStatusBadge(true);
                     speakWebSpeech(text);
                     return;
                 }
             }
 
+            // FISH.AUDIO SYNTHESIS
+            if (activeProvider === 'fish') {
+                if (!fishApiKey) {
+                    showModalAlert("Fish.Audio API Key is missing!");
+                    updateStatusBadge(true);
+                    speakWebSpeech(text);
+                    return;
+                }
+
+                const endpoint = 'https://api.fish.audio/v1/tts';
+                const payload = { text: text };
+                if (fishVoiceId) payload.reference_id = fishVoiceId;
+
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + fishApiKey
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errText = await response.text().catch(() => '');
+                        showModalAlert(`Fish.Audio Error HTTP ${response.status}: ${errText.slice(0,60)}`);
+                        updateStatusBadge(true);
+                        speakWebSpeech(text);
+                        return;
+                    }
+
+                    const arrayBuffer = await response.arrayBuffer();
+                    const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
+                    const url = URL.createObjectURL(blob);
+                    currentAudio = new Audio(url);
+                    currentAudio.play();
+                    updateStatusBadge(false);
+                    return;
+                } catch (err) {
+                    console.error("Fish.Audio Fetch Exception:", err);
+                    showModalAlert("Fish.Audio Network / CORS Error: " + err.message);
+                    updateStatusBadge(true);
+                    speakWebSpeech(text);
+                    return;
+                }
+            }
+
+            // DEFAULT: BROWSER NATIVE SPEECH
+            updateStatusBadge(false);
             speakWebSpeech(text);
         }
 
-        /* SPEECH RECOGNITION SETUP */
+        function testVoice() {
+            activeProvider = document.getElementById('voice-provider-select').value;
+            fishApiKey = document.getElementById('fish-key').value.trim();
+            fishVoiceId = document.getElementById('fish-voice').value.trim();
+            elevenApiKey = document.getElementById('eleven-key').value.trim();
+            elevenVoiceId = document.getElementById('eleven-voice').value.trim();
+
+            clearModalAlert();
+            speakDealerText("Hello friend! Let's count cards to 21!");
+        }
+
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isListening = false;
 
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
@@ -530,7 +603,7 @@
 
         function toggleVoiceRecognition() {
             if (!recognition) {
-                alert("Voice feature is supported in Chrome & Safari browsers!");
+                alert("Voice commands are supported in Chrome & Safari!");
                 return;
             }
 
@@ -542,7 +615,7 @@
                 recognition.start();
                 label.textContent = "LISTENING NOW!";
                 icon.className = "fas fa-microphone-lines text-yellow-300 animate-bounce text-xl sm:text-2xl";
-                showSpeechBubble("Say 'Hit', 'Card', or 'Stay'!");
+                showSpeechBubble("Say 'Card' or 'Stay'!");
                 speakDealerText("I am listening! Say Card or Stay!");
             } else {
                 recognition.stop();
@@ -562,7 +635,6 @@
             document.getElementById('speech-bubble').classList.add('opacity-0', 'pointer-events-none');
         }
 
-        /* KIDS 21 BLACKJACK GAME ENGINE */
         const ANIMAL_CARDS = [
             { name: 'Magic Ace', value: 11, emoji: '🦄', isAce: true },
             { name: 'Two Bunny', value: 2, emoji: '🐰' },
@@ -790,7 +862,6 @@
             banner.classList.remove('opacity-100', 'scale-100');
         }
 
-        /* INITIALIZATION */
         window.onload = function() {
             loadSavedSettings();
             updateAvatarUI();
