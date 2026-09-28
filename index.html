@@ -337,7 +337,7 @@
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body onclick="enableAudioContext()">
+<body onclick="unlockAudio()">
 
   <div class="app-container">
     <header>
@@ -361,7 +361,7 @@
       <div class="card-container" id="dealer-cards"></div>
     </div>
 
-    <div class="status-banner" id="status-text">Tap DEAL or say "DEAL" to start!</div>
+    <div class="status-banner" id="status-text">Tap anywhere to enable speech audio!</div>
 
     <!-- Player Area -->
     <div class="play-area">
@@ -408,6 +408,8 @@
     let isListeningWanted = true;
     let isSpeaking = false;
     let availableVoices = [];
+    let speechTimer = null;
+    let audioUnlocked = false;
 
     // Stats tracking
     let wins = parseInt(localStorage.getItem('m21_wins') || '0');
@@ -416,12 +418,22 @@
 
     // Web Audio FX
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function enableAudioContext() {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
+    
+    function unlockAudio() {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      if ('speechSynthesis' in window && !audioUnlocked) {
+        window.speechSynthesis.resume();
+        // Warm up speech synthesis engine with silent utterance
+        const silentUtterance = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.speak(silentUtterance);
+        audioUnlocked = true;
+      }
     }
 
     function playCardSound() {
-      enableAudioContext();
+      unlockAudio();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
@@ -436,7 +448,7 @@
     }
 
     function playWinSound() {
-      enableAudioContext();
+      unlockAudio();
       [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -478,11 +490,12 @@
     }
 
     function speak(text, callback) {
+      unlockAudio();
       if (!('speechSynthesis' in window)) {
         if (callback) callback();
         return;
       }
-      
+
       window.speechSynthesis.cancel();
       pauseRecognitionForSpeech();
 
@@ -494,14 +507,19 @@
       utterance.pitch = 1.0;
       utterance.rate = 0.95;
 
-      utterance.onend = () => {
+      const finishSpeech = () => {
+        if (speechTimer) clearTimeout(speechTimer);
         resumeRecognitionAfterSpeech();
         if (callback) callback();
       };
-      utterance.onerror = () => {
-        resumeRecognitionAfterSpeech();
-        if (callback) callback();
-      };
+
+      utterance.onend = finishSpeech;
+      utterance.onerror = finishSpeech;
+
+      // Safety fallback: ensure mic turns green after 4 seconds even if speech gets blocked/stuck
+      speechTimer = setTimeout(() => {
+        finishSpeech();
+      }, 4000);
 
       window.speechSynthesis.speak(utterance);
     }
@@ -510,7 +528,7 @@
       speak("You can say: Hit, Stay, Deal, Double, Surrender, or Help.");
     }
 
-    // Continuous Speech Recognition Logic
+    // Speech Recognition Logic
     function pauseRecognitionForSpeech() {
       isSpeaking = true;
       updateMicUI('paused', "📢 Barnaby Talking...");
@@ -550,7 +568,7 @@
         handleVoiceCommand(cmd);
       };
 
-      recognition.onerror = (e) => {
+      recognition.onerror = () => {
         if (isListeningWanted && !isSpeaking) {
           setTimeout(startRecognition, 300);
         }
@@ -663,7 +681,7 @@
     }
 
     function startNewGame() {
-      enableAudioContext();
+      unlockAudio();
       buildDeck();
       playCardSound();
       playerHand = [deck.pop(), deck.pop()];
