@@ -193,6 +193,13 @@
                     <label class="block text-[11px] uppercase text-sunshine">ElevenLabs API Key (`xi-api-key`)</label>
                     <input type="password" id="eleven-key" placeholder="e.g. sk_12345..." class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
                     
+                    <label class="block text-[11px] uppercase text-sunshine">Model ID</label>
+                    <select id="eleven-model" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-bold border-2 border-yellow-300 focus:outline-none text-xs">
+                        <option value="eleven_flash_v2_5" selected>⚡ eleven_flash_v2_5 (Fastest & Ultra Low Latency)</option>
+                        <option value="eleven_multilingual_v2">🌐 eleven_multilingual_v2 (High Quality Multi-language)</option>
+                        <option value="eleven_v3">🌟 eleven_v3 (Expressive & Natural)</option>
+                    </select>
+
                     <label class="block text-[11px] uppercase text-sunshine">Voice ID (Optional)</label>
                     <input type="text" id="eleven-voice" placeholder="e.g. 21m00Tcm4TlvDq8ikWAM (Rachel default)" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
                 </div>
@@ -363,6 +370,7 @@
         let fishVoiceId = '';
         let elevenApiKey = '';
         let elevenVoiceId = '';
+        let elevenModelId = 'eleven_flash_v2_5';
         let currentAudio = null;
         const synth = window.speechSynthesis;
 
@@ -372,12 +380,14 @@
             fishVoiceId = localStorage.getItem('m21_fish_voice') || '';
             elevenApiKey = localStorage.getItem('m21_eleven_key') || '';
             elevenVoiceId = localStorage.getItem('m21_eleven_voice') || '';
+            elevenModelId = localStorage.getItem('m21_eleven_model') || 'eleven_flash_v2_5';
 
             document.getElementById('voice-provider-select').value = activeProvider;
             document.getElementById('fish-key').value = fishApiKey;
             document.getElementById('fish-voice').value = fishVoiceId;
             document.getElementById('eleven-key').value = elevenApiKey;
             document.getElementById('eleven-voice').value = elevenVoiceId;
+            document.getElementById('eleven-model').value = elevenModelId;
 
             toggleProviderSections();
             updateStatusBadge();
@@ -389,12 +399,14 @@
             fishVoiceId = document.getElementById('fish-voice').value.trim();
             elevenApiKey = document.getElementById('eleven-key').value.trim();
             elevenVoiceId = document.getElementById('eleven-voice').value.trim();
+            elevenModelId = document.getElementById('eleven-model').value;
 
             localStorage.setItem('m21_provider', activeProvider);
             localStorage.setItem('m21_fish_key', fishApiKey);
             localStorage.setItem('m21_fish_voice', fishVoiceId);
             localStorage.setItem('m21_eleven_key', elevenApiKey);
             localStorage.setItem('m21_eleven_voice', elevenVoiceId);
+            localStorage.setItem('m21_eleven_model', elevenModelId);
 
             clearModalAlert();
             updateStatusBadge();
@@ -474,6 +486,7 @@
                 }
 
                 const voiceId = elevenVoiceId || '21m00Tcm4TlvDq8ikWAM';
+                const selectedModel = elevenModelId || 'eleven_flash_v2_5';
                 const endpoint = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
 
                 try {
@@ -485,7 +498,7 @@
                         },
                         body: JSON.stringify({
                             text: text,
-                            model_id: "eleven_monolingual_v1"
+                            model_id: selectedModel
                         })
                     });
 
@@ -572,6 +585,7 @@
             fishVoiceId = document.getElementById('fish-voice').value.trim();
             elevenApiKey = document.getElementById('eleven-key').value.trim();
             elevenVoiceId = document.getElementById('eleven-voice').value.trim();
+            elevenModelId = document.getElementById('eleven-model').value;
 
             clearModalAlert();
             speakDealerText("Hello friend! Let's count cards to 21!");
