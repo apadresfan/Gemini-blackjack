@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monster Math 21 - Kids Voice Blackjack</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for Kids -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Mali:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        playpen: '#FF5252',
+                        sunshine: '#FFD54F',
+                        bubblegum: '#FF4081',
+                        sky: '#40C4FF',
+                        limey: '#69F0AE',
+                        purplepop: '#E040FB',
+                        cookie: '#FF9100'
+                    },
+                    fontFamily: {
+                        kids: ['"Fredoka One"', 'cursive', 'sans-serif'],
+                        friendly: ['"Mali"', 'cursive', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #40C4FF 0%, #E040FB 50%, #FF4081 100%);
+            font-family: 'Fredoka One', cursive, sans-serif;
+            user-select: none;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .bounce-btn {
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.15s ease;
+            box-shadow: 0 8px 0px rgba(0,0,0,0.25);
+        }
+
+        .bounce-btn:hover {
+            transform: translateY(-4px) scale(1.04);
+            box-shadow: 0 12px 0px rgba(0,0,0,0.25);
+        }
+
+        .bounce-btn:active {
+            transform: translateY(4px) scale(0.97);
+            box-shadow: 0 2px 0px rgba(0,0,0,0.25);
+        }
+
+        .kid-card {
+            perspective: 1000px;
+            width: 100px;
+            height: 140px;
+            transition: transform 0.3s ease;
+        }
+
+        @media (min-width: 640px) {
+            .kid-card {
+                width: 130px;
+                height: 180px;
+            }
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+        }
+
+        .kid-card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            border: 4px solid #ffffff;
+            overflow: hidden;
+        }
+
+        .card-front {
+            background: #ffffff;
+            transform: rotateY(180deg);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #FF5252, #FFD54F);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes float-star {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(12deg); }
+        }
+
+        .floating-star {
+            animation: float-star 2.8s infinite ease-in-out;
+        }
+
+        @keyframes wobble {
+            0%, 100% { transform: rotate(-4deg); }
+            50% { transform: rotate(4deg); }
+        }
+
+        .wobbly {
+            animation: wobble 2.2s infinite ease-in-out;
+        }
+
+        .rainbow-text {
+            background: linear-gradient(to right, #FF5252, #FFD54F, #69F0AE, #40C4FF, #E040FB);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="flex flex-col justify-between p-3 sm:p-5 text-white min-h-screen">
+
+    <!-- TOP HEADER BAR -->
+    <header class="w-full max-w-5xl mx-auto flex items-center justify-between gap-2 p-3 bg-white/20 backdrop-blur-md rounded-3xl border-4 border-white/60 shadow-xl">
+        
+        <!-- Game Title & Character Avatar -->
+        <div class="flex items-center gap-2 sm:gap-3">
+            <button onclick="cycleAvatar()" class="w-12 h-12 rounded-2xl bg-sunshine flex items-center justify-center text-3xl shadow-inner border-2 border-white wobbly bounce-btn" title="Click to change dealer!">
+                <span id="current-avatar-emoji">🐻</span>
+            </button>
+            <div>
+                <h1 class="text-lg sm:text-2xl font-black text-sunshine drop-shadow-md tracking-wider">MONSTER MATH 21</h1>
+                <p class="text-[10px] sm:text-xs text-white/90 font-friendly font-bold">Dealer: <span id="current-avatar-name">Barnaby Bear</span></p>
+            </div>
+        </div>
+
+        <!-- Magic Cookie Tokens Display -->
+        <div class="flex items-center gap-2 bg-amber-400 text-purple-950 px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl border-4 border-white shadow-md">
+            <span class="text-xl sm:text-2xl floating-star">⭐</span>
+            <div>
+                <span class="text-[9px] sm:text-[10px] uppercase font-bold block leading-none text-purple-950">Stars</span>
+                <span id="star-count" class="text-xl sm:text-2xl font-black leading-none">10</span>
+            </div>
+        </div>
+
+        <!-- Settings Gear Button -->
+        <button onclick="openSettingsModal()" class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-purplepop hover:bg-purple-600 border-4 border-white flex items-center justify-center text-white text-lg sm:text-xl bounce-btn shadow-lg" title="Voice & Settings">
+            <i class="fas fa-gear"></i>
+        </button>
+    </header>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 p-4">
+        <div class="bg-gradient-to-b from-sky to-purplepop border-4 border-white rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl text-white relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeSettingsModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-playpen border-2 border-white text-white font-bold text-lg flex items-center justify-center bounce-btn">
+                ✕
+            </button>
+
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-3xl">🔊</span>
+                <div>
+                    <h3 class="text-xl sm:text-2xl font-black text-sunshine">Voice & API Settings</h3>
+                    <p class="text-xs text-white/90 font-friendly">Choose native voice, Fish.Audio, or ElevenLabs!</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 font-friendly font-bold text-xs sm:text-sm">
+                <!-- Voice Provider Selector -->
+                <div>
+                    <label class="block mb-1 text-sunshine text-xs uppercase">Voice Engine Provider</label>
+                    <select id="voice-provider-select" onchange="toggleProviderSections()" class="w-full p-3 rounded-2xl bg-white text-purple-900 font-bold border-2 border-yellow-300 focus:outline-none">
+                        <option value="web">🗣️ Browser Native Speech (Free & Built-in)</option>
+                        <option value="fish">🐟 Fish.Audio API (Natural Voices)</option>
+                        <option value="elevenlabs">🎙️ ElevenLabs API (Realistic Expressive Voices)</option>
+                    </select>
+                </div>
+
+                <!-- Fish.Audio Section -->
+                <div id="fish-section" class="hidden space-y-2 p-3 bg-white/20 rounded-2xl border-2 border-white">
+                    <label class="block text-[11px] uppercase text-sunshine">Fish.Audio API Key</label>
+                    <input type="password" id="fish-key" placeholder="Paste Fish.Audio API Key" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
+                    
+                    <label class="block text-[11px] uppercase text-sunshine">Voice / Model ID (Optional)</label>
+                    <input type="text" id="fish-voice" placeholder="e.g. 7f92f8afb8ec43bf81429cc1c9199cb1" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
+                </div>
+
+                <!-- ElevenLabs Section -->
+                <div id="eleven-section" class="hidden space-y-2 p-3 bg-white/20 rounded-2xl border-2 border-white">
+                    <label class="block text-[11px] uppercase text-sunshine">ElevenLabs API Key</label>
+                    <input type="password" id="eleven-key" placeholder="Paste ElevenLabs API Key" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
+                    
+                    <label class="block text-[11px] uppercase text-sunshine">Voice ID</label>
+                    <input type="text" id="eleven-voice" placeholder="e.g. 21m00Tcm4TlvDq8ikWAM (Rachel/Custom)" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
+                    <p class="text-[10px] text-white/80">Default voice preset loaded if left blank.</p>
+                </div>
+
+                <div class="pt-2 flex gap-2">
+                    <button onclick="testVoice()" class="px-4 py-3 bg-sunshine text-purple-900 rounded-2xl font-black text-xs sm:text-sm border-2 border-white bounce-btn">
+                        Test Voice 📣
+                    </button>
+                    <button onclick="saveVoiceSettings()" class="flex-1 py-3 bg-limey text-purple-950 rounded-2xl font-black text-xs sm:text-sm border-2 border-white bounce-btn">
+                        Save Settings 🎉
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PLAY AREA -->
+    <main class="w-full max-w-4xl mx-auto my-2 sm:my-4 flex-1 flex flex-col justify-between p-3 sm:p-5 bg-white/25 backdrop-blur-md rounded-3xl border-4 border-white/60 shadow-2xl relative min-h-[460px]">
+        
+        <!-- Speech Bubble -->
+        <div id="speech-bubble" class="absolute top-2 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-sunshine text-purple-950 font-bold text-xs sm:text-sm border-4 border-white shadow-lg transition-all duration-300 opacity-0 pointer-events-none z-30 flex items-center gap-2">
+            <span>💬</span>
+            <span id="speech-bubble-text">"Say HIT or STAY!"</span>
+        </div>
+
+        <!-- DEALER SECTION -->
+        <section class="flex flex-col items-center justify-start gap-1">
+            <div class="flex items-center gap-2">
+                <div class="w-9 h-9 rounded-full bg-limey flex items-center justify-center text-xl border-2 border-white wobbly shadow">
+                    <span id="dealer-avatar-icon">🐻</span>
+                </div>
+                <span id="dealer-name-label" class="text-sm sm:text-base font-black text-sunshine drop-shadow">Barnaby Bear</span>
+                <span id="dealer-score" class="px-3 py-0.5 bg-white text-purple-900 rounded-full font-black text-xs border-2 border-yellow-300 shadow hidden">0</span>
+            </div>
+
+            <!-- Dealer Cards -->
+            <div id="dealer-cards" class="flex justify-center items-center gap-2 py-2 min-h-[140px]">
+                <!-- Dynamic Cards -->
+            </div>
+        </section>
+
+        <!-- CENTER MESSAGE BANNER & MATH EQUATION HELPER -->
+        <div class="relative my-1 flex flex-col items-center justify-center text-center">
+            
+            <!-- Visual Math Helper Box -->
+            <div id="math-helper" class="mb-2 px-4 py-1.5 bg-white/90 text-purple-950 rounded-full font-black text-xs sm:text-sm border-2 border-purple-300 shadow flex items-center gap-2">
+                <span>🧮 Math Helper:</span>
+                <span id="math-equation-text" class="text-purple-700">0 = 0</span>
+            </div>
+
+            <div id="game-banner" class="p-3 sm:p-4 rounded-3xl bg-sunshine text-purple-950 border-4 border-white shadow-2xl transition-all duration-300 scale-90 opacity-0 pointer-events-none max-w-sm w-full z-20">
+                <h2 id="banner-title" class="text-xl sm:text-3xl font-black uppercase">21! PERFECT MATH! ⭐</h2>
+                <p id="banner-subtitle" class="text-xs sm:text-sm font-friendly font-bold mt-1 text-purple-900">You scored exactly 21!</p>
+            </div>
+        </div>
+
+        <!-- PLAYER SECTION -->
+        <section class="flex flex-col items-center justify-end gap-1">
+            <!-- Player Cards -->
+            <div id="player-cards" class="flex justify-center items-center gap-2 py-2 min-h-[140px]">
+                <!-- Dynamic Cards -->
+            </div>
+
+            <div class="flex items-center gap-2">
+                <span class="text-sm sm:text-base font-black text-sunshine drop-shadow">Your Magic Hand</span>
+                <span id="player-score" class="px-3 py-0.5 bg-white text-purple-900 rounded-full font-black text-xs border-2 border-yellow-300 shadow hidden">0</span>
+            </div>
+        </section>
+    </main>
+
+    <!-- BOTTOM CONTROLS & VOICE BUTTON -->
+    <footer class="w-full max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-white/20 backdrop-blur-md rounded-3xl border-4 border-white/50 shadow-xl">
+        
+        <!-- Microphone Toggle -->
+        <button id="mic-btn" onclick="toggleVoiceRecognition()" class="w-full sm:w-auto px-4 py-3 rounded-2xl bg-playpen hover:bg-red-500 border-4 border-white flex items-center justify-center gap-3 bounce-btn text-white shadow-lg">
+            <i id="mic-icon" class="fas fa-microphone text-xl sm:text-2xl"></i>
+            <div class="text-left">
+                <span id="mic-label" class="block text-xs sm:text-sm font-black">TALK TO DEALER</span>
+                <span class="block text-[9px] sm:text-[10px] font-friendly font-bold text-white/80">Say "Card" or "Stay"</span>
+            </div>
+        </button>
+
+        <!-- Action Controls -->
+        <div id="game-controls" class="flex items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto">
+            <button id="btn-hit" onclick="playerHit()" class="flex-1 sm:flex-none px-4 sm:px-6 py-3.5 rounded-2xl bg-limey text-purple-950 font-black text-sm sm:text-base border-4 border-white bounce-btn shadow-lg flex items-center justify-center gap-1.5">
+                <span>➕</span> CARD / HIT
+            </button>
+            <button id="btn-stand" onclick="playerStand()" class="flex-1 sm:flex-none px-4 sm:px-6 py-3.5 rounded-2xl bg-sunshine text-purple-950 font-black text-sm sm:text-base border-4 border-white bounce-btn shadow-lg flex items-center justify-center gap-1.5">
+                <span>✋</span> STAY
+            </button>
+            <button id="btn-deal" onclick="startNewHand()" class="hidden px-8 py-3.5 rounded-2xl bg-purplepop text-white font-black text-base sm:text-lg border-4 border-white bounce-btn shadow-lg">
+                PLAY AGAIN! 🎈
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        /* SOUND EFFECTS SYNTHESIZER */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playKidSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+
+            if (type === 'pop') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(320, now);
+                osc.frequency.exponentialRampToValueAtTime(850, now + 0.08);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'win') {
+                confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+                [392, 523, 659, 783, 1046].forEach((freq, i) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.type = 'triangle';
+                    o.frequency.setValueAtTime(freq, now + i * 0.07);
+                    g.connect(audioCtx.destination);
+                    o.connect(g);
+                    g.gain.setValueAtTime(0.2, now + i * 0.07);
+                    g.gain.linearRampToValueAtTime(0.01, now + i * 0.07 + 0.2);
+                    o.start(now + i * 0.07);
+                    o.stop(now + i * 0.07 + 0.2);
+                });
+            } else if (type === 'oops') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(260, now);
+                osc.frequency.linearRampToValueAtTime(120, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            }
+        }
+
+        /* DEALER AVATARS */
+        const DEALER_AVATARS = [
+            { name: "Barnaby Bear", emoji: "🐻" },
+            { name: "Sparky Dragon", emoji: "🐲" },
+            { name: "Pip Bunny", emoji: "🐰" }
+        ];
+        let avatarIndex = 0;
+
+        function cycleAvatar() {
+            avatarIndex = (avatarIndex + 1) % DEALER_AVATARS.length;
+            updateAvatarUI();
+            speakDealerText("Hi! I am " + DEALER_AVATARS[avatarIndex].name + "! Let's play math 21!");
+        }
+
+        function updateAvatarUI() {
+            const current = DEALER_AVATARS[avatarIndex];
+            document.getElementById('current-avatar-emoji').textContent = current.emoji;
+            document.getElementById('current-avatar-name').textContent = current.name;
+            document.getElementById('dealer-avatar-icon').textContent = current.emoji;
+            document.getElementById('dealer-name-label').textContent = current.name;
+        }
+
+        /* SPEECH PROVIDERS & VOICE SETTINGS */
+        let activeProvider = 'web';
+        let fishApiKey = '';
+        let fishVoiceId = '';
+        let elevenApiKey = '';
+        let elevenVoiceId = '';
+        let speechEnabled = true;
+        let isListening = false;
+        let recognition = null;
+        const synth = window.speechSynthesis;
+
+        function loadSavedSettings() {
+            activeProvider = localStorage.getItem('m21_provider') || 'web';
+            fishApiKey = localStorage.getItem('m21_fish_key') || '';
+            fishVoiceId = localStorage.getItem('m21_fish_voice') || '';
+            elevenApiKey = localStorage.getItem('m21_eleven_key') || '';
+            elevenVoiceId = localStorage.getItem('m21_eleven_voice') || '';
+
+            document.getElementById('voice-provider-select').value = activeProvider;
+            document.getElementById('fish-key').value = fishApiKey;
+            document.getElementById('fish-voice').value = fishVoiceId;
+            document.getElementById('eleven-key').value = elevenApiKey;
+            document.getElementById('eleven-voice').value = elevenVoiceId;
+
+            toggleProviderSections();
+        }
+
+        function saveVoiceSettings() {
+            activeProvider = document.getElementById('voice-provider-select').value;
+            fishApiKey = document.getElementById('fish-key').value.trim();
+            fishVoiceId = document.getElementById('fish-voice').value.trim();
+            elevenApiKey = document.getElementById('eleven-key').value.trim();
+            elevenVoiceId = document.getElementById('eleven-voice').value.trim();
+
+            localStorage.setItem('m21_provider', activeProvider);
+            localStorage.setItem('m21_fish_key', fishApiKey);
+            localStorage.setItem('m21_fish_voice', fishVoiceId);
+            localStorage.setItem('m21_eleven_key', elevenApiKey);
+            localStorage.setItem('m21_eleven_voice', elevenVoiceId);
+
+            closeSettingsModal();
+            speakDealerText("Settings saved! Ready to count to 21!");
+        }
+
+        function toggleProviderSections() {
+            const provider = document.getElementById('voice-provider-select').value;
+            document.getElementById('fish-section').classList.toggle('hidden', provider !== 'fish');
+            document.getElementById('eleven-section').classList.toggle('hidden', provider !== 'elevenlabs');
+        }
+
+        function openSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100');
+        }
+
+        function closeSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.classList.remove('opacity-100');
+        }
+
+        function testVoice() {
+            saveVoiceSettings();
+            speakDealerText("Hello friend! Let's reach magic 21!");
+        }
+
+        function speakWebSpeech(text) {
+            if (!synth) return;
+            synth.cancel();
+            const utt = new SpeechSynthesisUtterance(text);
+            utt.pitch = 1.3;
+            utt.rate = 0.95;
+            synth.speak(utt);
+        }
+
+        async function speakDealerText(text) {
+            if (!speechEnabled) return;
+            showSpeechBubble(text);
+
+            if (activeProvider === 'fish' && fishApiKey) {
+                try {
+                    const res = await fetch('https://api.fish.audio/v1/tts', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + fishApiKey,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            text: text,
+                            reference_id: fishVoiceId || '7f92f8afb8ec43bf81429cc1c9199cb1',
+                            format: 'mp3'
+                        })
+                    });
+                    if (!res.ok) throw new Error("Fish Audio API Error");
+                    const blob = await res.blob();
+                    const audio = new Audio(URL.createObjectURL(blob));
+                    audio.play();
+                    return;
+                } catch (e) {
+                    speakWebSpeech(text);
+                    return;
+                }
+            } else if (activeProvider === 'elevenlabs' && elevenApiKey) {
+                try {
+                    const vid = elevenVoiceId || '21m00Tcm4TlvDq8ikWAM'; // Rachel default
+                    const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${vid}`, {
+                        method: 'POST',
+                        headers: {
+                            'xi-api-key': elevenApiKey,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            text: text,
+                            model_id: "eleven_monolingual_v1",
+                            voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+                        })
+                    });
+                    if (!res.ok) throw new Error("ElevenLabs API Error");
+                    const blob = await res.blob();
+                    const audio = new Audio(URL.createObjectURL(blob));
+                    audio.play();
+                    return;
+                } catch (e) {
+                    speakWebSpeech(text);
+                    return;
+                }
+            }
+
+            speakWebSpeech(text);
+        }
+
+        /* SPEECH RECOGNITION SETUP */
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = (event) => {
+                const speech = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                showSpeechBubble('"' + speech + '"');
+
+                if (speech.includes('card') || speech.includes('hit') || speech.includes('more') || speech.includes('please')) {
+                    playerHit();
+                } else if (speech.includes('stay') || speech.includes('stand') || speech.includes('stop') || speech.includes('no')) {
+                    playerStand();
+                } else if (speech.includes('again') || speech.includes('play') || speech.includes('deal') || speech.includes('start')) {
+                    startNewHand();
+                }
+            };
+        }
+
+        function toggleVoiceRecognition() {
+            if (!recognition) {
+                alert("Voice feature is supported in Chrome & Safari browsers!");
+                return;
+            }
+
+            isListening = !isListening;
+            const label = document.getElementById('mic-label');
+            const icon = document.getElementById('mic-icon');
+
+            if (isListening) {
+                recognition.start();
+                label.textContent = "LISTENING NOW!";
+                icon.className = "fas fa-microphone-lines text-yellow-300 animate-bounce text-xl sm:text-2xl";
+                showSpeechBubble("Say 'Hit', 'Card', or 'Stay'!");
+                speakDealerText("I am listening! Say Card or Stay!");
+            } else {
+                recognition.stop();
+                label.textContent = "TALK TO DEALER";
+                icon.className = "fas fa-microphone text-xl sm:text-2xl";
+                hideSpeechBubble();
+            }
+        }
+
+        function showSpeechBubble(text) {
+            const bubble = document.getElementById('speech-bubble');
+            document.getElementById('speech-bubble-text').textContent = text;
+            bubble.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function hideSpeechBubble() {
+            document.getElementById('speech-bubble').classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        /* KIDS 21 BLACKJACK GAME ENGINE */
+        const ANIMAL_CARDS = [
+            { name: 'Magic Ace', value: 11, emoji: '🦄', isAce: true },
+            { name: 'Two Bunny', value: 2, emoji: '🐰' },
+            { name: 'Three Kitty', value: 3, emoji: '🐱' },
+            { name: 'Four Puppy', value: 4, emoji: '🐶' },
+            { name: 'Five Frog', value: 5, emoji: '🐸' },
+            { name: 'Six Fox', value: 6, emoji: '🦊' },
+            { name: 'Seven Panda', value: 7, emoji: '🐼' },
+            { name: 'Eight Tiger', value: 8, emoji: '🐯' },
+            { name: 'Nine Lion', value: 9, emoji: '🦁' },
+            { name: 'Ten Monster', value: 10, emoji: '👾' },
+            { name: 'Jack Dragon', value: 10, emoji: '🐲' },
+            { name: 'Queen Unicorn', value: 10, emoji: '🦄' },
+            { name: 'King Bear', value: 10, emoji: '🐻' }
+        ];
+
+        let playerHand = [];
+        let dealerHand = [];
+        let stars = 10;
+        let inGame = false;
+
+        function drawRandomCard() {
+            const template = ANIMAL_CARDS[Math.floor(Math.random() * ANIMAL_CARDS.length)];
+            return { ...template };
+        }
+
+        function calculateScore(hand) {
+            let score = 0;
+            let aces = 0;
+
+            hand.forEach(card => {
+                score += card.value;
+                if (card.isAce) aces += 1;
+            });
+
+            while (score > 21 && aces > 0) {
+                score -= 10;
+                aces -= 1;
+            }
+
+            return score;
+        }
+
+        function renderCardHTML(card, container, hidden = false) {
+            const div = document.createElement('div');
+            div.className = 'kid-card' + (hidden ? '' : ' flipped');
+
+            const displayVal = card.isAce ? 'A' : card.value;
+
+            div.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-back">
+                        <span class="text-3xl sm:text-4xl">⭐</span>
+                    </div>
+                    <div class="card-front p-2 flex flex-col justify-between items-center font-black">
+                        <span class="text-xl sm:text-2xl text-purple-600 self-start leading-none">${displayVal}</span>
+                        <span class="text-3xl sm:text-5xl">${card.emoji}</span>
+                        <span class="text-xl sm:text-2xl text-purple-600 self-end leading-none">${displayVal}</span>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(div);
+            playKidSound('pop');
+
+            if (!hidden) {
+                setTimeout(() => div.classList.add('flipped'), 50);
+            }
+        }
+
+        function updateMathHelper() {
+            if (playerHand.length === 0) {
+                document.getElementById('math-equation-text').textContent = '0 = 0';
+                return;
+            }
+
+            const values = playerHand.map(c => c.isAce ? '11/1' : c.value);
+            const total = calculateScore(playerHand);
+            document.getElementById('math-equation-text').textContent = values.join(' + ') + ' = ' + total;
+        }
+
+        function renderBoard() {
+            const pBox = document.getElementById('player-cards');
+            const dBox = document.getElementById('dealer-cards');
+
+            pBox.innerHTML = '';
+            dBox.innerHTML = '';
+
+            playerHand.forEach(c => renderCardHTML(c, pBox, false));
+            dealerHand.forEach(c => renderCardHTML(c, dBox, c.hidden));
+
+            const pScore = calculateScore(playerHand);
+            const dVisibleScore = calculateScore(dealerHand.filter(c => !c.hidden));
+
+            const pBadge = document.getElementById('player-score');
+            const dBadge = document.getElementById('dealer-score');
+
+            pBadge.textContent = 'Total: ' + pScore;
+            pBadge.classList.remove('hidden');
+
+            dBadge.textContent = 'Total: ' + dVisibleScore;
+            dBadge.classList.remove('hidden');
+
+            updateMathHelper();
+        }
+
+        function startNewHand() {
+            playerHand = [drawRandomCard(), drawRandomCard()];
+            
+            const hiddenCard = drawRandomCard();
+            hiddenCard.hidden = true;
+            dealerHand = [drawRandomCard(), hiddenCard];
+
+            inGame = true;
+
+            document.getElementById('btn-hit').classList.remove('hidden');
+            document.getElementById('btn-stand').classList.remove('hidden');
+            document.getElementById('btn-deal').classList.add('hidden');
+            hideBanner();
+
+            renderBoard();
+
+            const pScore = calculateScore(playerHand);
+
+            if (pScore === 21) {
+                playKidSound('win');
+                speakDealerText("WOW! Magic 21 Blackjack right away!");
+                endHand('WIN_21');
+            } else {
+                speakDealerText("Target is 21! Your card total is " + pScore + ". Want another card?");
+            }
+        }
+
+        function playerHit() {
+            if (!inGame) return;
+
+            const newCard = drawRandomCard();
+            playerHand.push(newCard);
+            renderBoard();
+
+            const score = calculateScore(playerHand);
+
+            if (score > 21) {
+                playKidSound('oops');
+                speakDealerText("Oh silly! You reached " + score + ". That went over 21!");
+                endHand('BUST');
+            } else if (score === 21) {
+                playKidSound('win');
+                speakDealerText("YES! Exactly 21! You win magic stars!");
+                endHand('WIN_21');
+            } else {
+                speakDealerText("You pulled " + newCard.value + "! New total is " + score + "! Want another?");
+            }
+        }
+
+        function playerStand() {
+            if (!inGame) return;
+
+            dealerHand[1].hidden = false;
+            renderBoard();
+
+            let dScore = calculateScore(dealerHand);
+            const pScore = calculateScore(playerHand);
+
+            speakDealerText("Flipping dealer card! Dealer total is " + dScore);
+
+            setTimeout(() => {
+                if (dScore < 17) {
+                    dealerHand.push(drawRandomCard());
+                    renderBoard();
+                    dScore = calculateScore(dealerHand);
+                }
+
+                if (dScore > 21 || pScore > dScore) {
+                    playKidSound('win');
+                    speakDealerText("Hooray! Your " + pScore + " beat " + dScore + "! You win stars!");
+                    endHand('WIN');
+                } else if (dScore === pScore) {
+                    speakDealerText("It is a tie at " + pScore + "! High five!");
+                    endHand('TIE');
+                } else {
+                    playKidSound('oops');
+                    speakDealerText("Dealer got " + dScore + " and won this round! Let's play again!");
+                    endHand('LOSE');
+                }
+            }, 1200);
+        }
+
+        function endHand(result) {
+            inGame = false;
+
+            const banner = document.getElementById('game-banner');
+            const title = document.getElementById('banner-title');
+            const subtitle = document.getElementById('banner-subtitle');
+
+            if (result === 'WIN_21') {
+                stars += 3;
+                title.textContent = "21! MAGIC 21! ⭐⭐⭐";
+                subtitle.textContent = "Perfect score of 21!";
+            } else if (result === 'WIN') {
+                stars += 1;
+                title.textContent = "YOU WIN STARS! ⭐";
+                subtitle.textContent = "Awesome counting to 21!";
+            } else if (result === 'TIE') {
+                title.textContent = "HIGH FIVE TIE! ✋";
+                subtitle.textContent = "Equal scores!";
+            } else {
+                title.textContent = "SO CLOSE! 🎈";
+                subtitle.textContent = "Let's play again to reach 21!";
+            }
+
+            document.getElementById('star-count').textContent = stars;
+            
+            banner.classList.remove('opacity-0', 'scale-90', 'pointer-events-none');
+            banner.classList.add('opacity-100', 'scale-100');
+
+            document.getElementById('btn-hit').classList.add('hidden');
+            document.getElementById('btn-stand').classList.add('hidden');
+            document.getElementById('btn-deal').classList.remove('hidden');
+        }
+
+        function hideBanner() {
+            const banner = document.getElementById('game-banner');
+            banner.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
+            banner.classList.remove('opacity-100', 'scale-100');
+        }
+
+        /* INITIALIZATION */
+        window.onload = function() {
+            loadSavedSettings();
+            updateAvatarUI();
+            startNewHand();
+        };
+    </script>
+</body>
+</html>
