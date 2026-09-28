@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Monster Math 21 - Mobile Edition</title>
+  <title>Monster Math 21 - Always-On Voice Edition</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Short+Stack&display=swap" rel="stylesheet">
@@ -50,7 +50,7 @@
       flex-direction: column;
       justify-content: space-between;
       padding: 0.4rem 0.6rem;
-      gap: 0.3rem;
+      gap: 0.25rem;
       max-width: 500px;
       margin: 0 auto;
     }
@@ -62,7 +62,7 @@
       background: rgba(255, 255, 255, 0.95);
       border: 3px dashed var(--primary-purple);
       border-radius: 16px;
-      padding: 0.3rem 0.6rem;
+      padding: 0.25rem 0.5rem;
       gap: 0.3rem;
       box-shadow: 0 4px 8px rgba(0,0,0,0.05);
       flex-shrink: 0;
@@ -70,7 +70,7 @@
 
     h1 {
       font-family: 'Fredoka One', cursive;
-      font-size: clamp(1rem, 4vw, 1.3rem);
+      font-size: clamp(0.95rem, 3.8vw, 1.25rem);
       color: var(--primary-red);
       text-shadow: 1.5px 1.5px 0px var(--primary-yellow);
       white-space: nowrap;
@@ -79,29 +79,29 @@
     .voice-bar {
       display: flex;
       align-items: center;
-      gap: 0.3rem;
+      gap: 0.25rem;
     }
 
     select {
       background: #fff;
       border: 2px solid var(--primary-blue);
       color: var(--text-color);
-      padding: 0.2rem 0.4rem;
+      padding: 0.2rem 0.3rem;
       border-radius: 10px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: bold;
       outline: none;
-      max-width: 110px;
+      max-width: 100px;
     }
 
     .icon-btn {
       background: var(--primary-yellow);
       border: 2px solid var(--primary-orange);
       color: #333;
-      padding: 0.25rem 0.5rem;
+      padding: 0.2rem 0.45rem;
       border-radius: 10px;
       font-family: 'Fredoka One', cursive;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       cursor: pointer;
       box-shadow: 0 2px 0 var(--primary-orange);
       display: flex;
@@ -118,7 +118,7 @@
       background: rgba(255, 255, 255, 0.95);
       border: 2px solid var(--primary-orange);
       border-radius: 14px;
-      padding: 0.25rem 0.8rem;
+      padding: 0.2rem 0.6rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -129,14 +129,14 @@
     .score-box {
       display: flex;
       align-items: center;
-      gap: 0.3rem;
+      gap: 0.25rem;
       font-family: 'Fredoka One', cursive;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
 
     .score-pill {
       background: #f0f0f0;
-      padding: 0.1rem 0.5rem;
+      padding: 0.08rem 0.45rem;
       border-radius: 8px;
       border: 1.5px solid #ccc;
       font-weight: bold;
@@ -161,14 +161,14 @@
       padding: 0.15rem 0.4rem;
       border-radius: 8px;
       font-family: 'Fredoka One', cursive;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       cursor: pointer;
     }
 
     .play-area {
       background: rgba(255, 255, 255, 0.9);
-      border-radius: 18px;
-      padding: 0.5rem 0.6rem;
+      border-radius: 16px;
+      padding: 0.4rem 0.5rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -189,45 +189,45 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 0.2rem;
+      margin-bottom: 0.15rem;
     }
 
     .monster-tag {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.35rem;
       font-family: 'Fredoka One', cursive;
-      font-size: clamp(0.85rem, 3.5vw, 1.05rem);
+      font-size: clamp(0.8rem, 3.3vw, 1rem);
     }
 
     .monster-avatar {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       line-height: 1;
     }
 
     .badge-score {
       background: var(--primary-yellow);
       border: 2px dashed var(--primary-orange);
-      padding: 0.15rem 0.6rem;
-      border-radius: 12px;
+      padding: 0.1rem 0.5rem;
+      border-radius: 10px;
       font-family: 'Fredoka One', cursive;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #444;
     }
 
     .card-container {
       display: flex;
-      gap: 0.4rem;
+      gap: 0.35rem;
       flex-wrap: nowrap;
       overflow-x: auto;
       align-items: center;
       flex: 1;
-      padding: 0.2rem 0;
+      padding: 0.15rem 0;
     }
 
     .card {
-      width: min(13vw, 55px);
-      height: min(19vw, 82px);
+      width: min(12vw, 52px);
+      height: min(18vw, 78px);
       background: #ffffff;
       border: 2px solid #333;
       border-radius: 10px;
@@ -257,16 +257,16 @@
       color: white;
       justify-content: center;
       align-items: center;
-      font-size: 1.4rem;
+      font-size: 1.3rem;
     }
 
     .card-corner {
-      font-size: clamp(0.65rem, 2.5vw, 0.85rem);
+      font-size: clamp(0.6rem, 2.3vw, 0.8rem);
       line-height: 1;
     }
 
     .card-center-icon {
-      font-size: clamp(0.9rem, 4vw, 1.3rem);
+      font-size: clamp(0.85rem, 3.8vw, 1.2rem);
       align-self: center;
       line-height: 1;
     }
@@ -274,23 +274,23 @@
     .speech-bubble {
       background: #fff;
       border: 3px solid var(--primary-red);
-      border-radius: 14px;
-      padding: 0.4rem 0.6rem;
+      border-radius: 12px;
+      padding: 0.35rem 0.5rem;
       text-align: center;
       font-family: 'Fredoka One', cursive;
-      font-size: clamp(0.8rem, 3.2vw, 0.95rem);
+      font-size: clamp(0.75rem, 3vw, 0.9rem);
       color: var(--primary-red);
       box-shadow: 0 3px 0 rgba(0,0,0,0.05);
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 38px;
+      min-height: 36px;
     }
 
     .controls {
       display: flex;
-      gap: 0.4rem;
+      gap: 0.35rem;
       justify-content: space-between;
       align-items: center;
       flex-shrink: 0;
@@ -299,10 +299,10 @@
 
     .btn-action {
       border: 2.5px solid #333;
-      padding: 0.5rem 0.2rem;
-      border-radius: 14px;
+      padding: 0.45rem 0.2rem;
+      border-radius: 12px;
       font-family: 'Fredoka One', cursive;
-      font-size: clamp(0.8rem, 3.2vw, 0.95rem);
+      font-size: clamp(0.75rem, 3vw, 0.9rem);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -315,19 +315,19 @@
     .btn-deal {
       background: var(--primary-yellow);
       color: #333;
-      box-shadow: 0 4px 0 var(--primary-orange);
+      box-shadow: 0 3px 0 var(--primary-orange);
     }
 
     .btn-hit {
       background: var(--primary-green);
       color: #1b5e20;
-      box-shadow: 0 4px 0 #388e3c;
+      box-shadow: 0 3px 0 #388e3c;
     }
 
     .btn-stand {
       background: var(--primary-red);
       color: white;
-      box-shadow: 0 4px 0 #d32f2f;
+      box-shadow: 0 3px 0 #d32f2f;
     }
 
     .btn-action:active:not(:disabled) {
@@ -342,25 +342,32 @@
     }
 
     .mic-button {
-      background: var(--primary-blue);
-      border: 2.5px solid #0288d1;
+      background: var(--primary-green);
+      border: 2.5px solid #2e7d32;
       border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      font-size: 1.2rem;
+      width: 42px;
+      height: 42px;
+      font-size: 1.1rem;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      box-shadow: 0 4px 0 #0277bd;
+      box-shadow: 0 3px 0 #1b5e20;
       flex-shrink: 0;
+      position: relative;
     }
 
     .mic-button.listening {
       background: var(--primary-red);
       border-color: #b71c1c;
-      box-shadow: 0 0 0 5px rgba(255, 82, 82, 0.4);
+      box-shadow: 0 0 0 4px rgba(255, 82, 82, 0.4);
       animation: pulseMic 1.2s infinite ease-in-out;
+    }
+
+    .mic-button.off {
+      background: #cfd8dc;
+      border-color: #78909c;
+      box-shadow: none;
     }
 
     @keyframes pulseMic {
@@ -375,6 +382,7 @@
     <header>
       <h1>✏️ Math 21</h1>
       <div class="voice-bar">
+        <button class="icon-btn" onclick="speakHelpCommands()" title="Commands Guide">❓ Help</button>
         <select id="voice-select" title="Choose Voice" onchange="saveVoiceSelection()"></select>
         <button class="icon-btn" onclick="testVoice()">🔊</button>
         <button class="icon-btn" onclick="toggleMute()"><span id="mute-icon">🔊</span></button>
@@ -407,7 +415,7 @@
     </div>
 
     <!-- Speech bubble message display -->
-    <div class="speech-bubble" id="status-text">Tap START to play! 🎲</div>
+    <div class="speech-bubble" id="status-text">Mic ON 🎙️ Say "Deal" or "Help"!</div>
 
     <!-- Player Play Area -->
     <div class="play-area player">
@@ -426,7 +434,7 @@
       <button class="btn-action btn-deal" id="btn-deal" onclick="startNewGame()">🎮 START</button>
       <button class="btn-action btn-hit" id="btn-hit" onclick="hit()" disabled>➕ CARD</button>
       <button class="btn-action btn-stand" id="btn-stand" onclick="stand()" disabled>✋ STAY</button>
-      <button class="mic-button" id="mic-btn" onclick="toggleListening()" title="Voice Control Mic">🎙️</button>
+      <button class="mic-button listening" id="mic-btn" onclick="toggleListeningUserOverride()" title="Toggle Mic Always-On">🎙️</button>
     </div>
   </div>
 
@@ -436,7 +444,8 @@
     let gameActive = false;
     let voiceEnabled = true;
     let recognition = null;
-    let isListening = false;
+    let keepMicActive = true; // Mic always-on state
+    let isListeningCurrently = false;
     let availableVoices = [];
 
     // Track total persistent stats via LocalStorage
@@ -560,6 +569,12 @@
       speak("Hi math superstar!");
     }
 
+    function speakHelpCommands() {
+      const helpMsg = "You can say: Hit or Hit Me for another card. Stay, Stand, or Pass to stop. Deal or Play to start. Double down, Surrender, or Help!";
+      document.getElementById('status-text').textContent = helpMsg;
+      speak(helpMsg);
+    }
+
     function buildDeck() {
       deck = [];
       for (let icon of cardIcons) {
@@ -662,6 +677,29 @@
       }
     }
 
+    function doubleDown() {
+      if (!gameActive) return;
+      if (playerHand.length !== 2) {
+        speak("You can only double down on your first two cards!");
+        return;
+      }
+      speak("Double down! One final card.");
+      hit();
+      if (gameActive) {
+        stand();
+      }
+    }
+
+    function surrender() {
+      if (!gameActive) return;
+      gameActive = false;
+      recordLoss();
+      const msg = "Surrendered hand. Barnaby wins this round.";
+      document.getElementById('status-text').textContent = msg;
+      speak(msg);
+      endGame();
+    }
+
     function stand() {
       if (!gameActive) return;
       gameActive = false;
@@ -703,34 +741,111 @@
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognition = new SpeechRecognition();
       recognition.continuous = false;
+      recognition.interimResults = false;
       recognition.lang = 'en-US';
 
-      recognition.onresult = (event) => {
-        const cmd = event.results[0][0].transcript.toLowerCase();
-        if (cmd.includes('hit') || cmd.includes('card') || cmd.includes('more')) {
-          hit();
-        } else if (cmd.includes('stay') || cmd.includes('stand') || cmd.includes('stop')) {
-          stand();
-        } else if (cmd.includes('start') || cmd.includes('deal') || cmd.includes('play')) {
-          startNewGame();
-        }
-        toggleListening(false);
+      recognition.onstart = () => {
+        isListeningCurrently = true;
+        updateMicUI();
       };
 
-      recognition.onerror = () => toggleListening(false);
-      recognition.onend = () => toggleListening(false);
+      recognition.onresult = (event) => {
+        const cmd = event.results[0][0].transcript.toLowerCase().trim();
+        console.log("Voice command heard:", cmd);
+
+        if (cmd.includes('help') || cmd.includes('commands') || cmd.includes('what can i say')) {
+          speakHelpCommands();
+        } else if (cmd.includes('double')) {
+          doubleDown();
+        } else if (cmd.includes('surrender') || cmd.includes('fold')) {
+          surrender();
+        } else if (cmd.includes('split')) {
+          speak("Splitting pairs is not supported in 21 single hand mode!");
+        } else if (
+          cmd.includes('hit') || 
+          cmd.includes('card') || 
+          cmd.includes('more') || 
+          cmd.includes('draw') || 
+          cmd.includes('twist')
+        ) {
+          hit();
+        } else if (
+          cmd.includes('stay') || 
+          cmd.includes('stand') || 
+          cmd.includes('stop') || 
+          cmd.includes('hold') || 
+          cmd.includes('stick') || 
+          cmd.includes('pass') || 
+          cmd.includes('no more')
+        ) {
+          stand();
+        } else if (
+          cmd.includes('start') || 
+          cmd.includes('deal') || 
+          cmd.includes('play') || 
+          cmd.includes('new game') || 
+          cmd.includes('next')
+        ) {
+          startNewGame();
+        }
+      };
+
+      // Continuous restart on recognition completion
+      recognition.onend = () => {
+        isListeningCurrently = false;
+        if (keepMicActive) {
+          setTimeout(() => {
+            try { recognition.start(); } catch(e) {}
+          }, 250);
+        } else {
+          updateMicUI();
+        }
+      };
+
+      // Continuous restart on recognition errors
+      recognition.onerror = (e) => {
+        console.warn("Speech recognition error/silence:", e.error);
+        isListeningCurrently = false;
+        if (keepMicActive) {
+          setTimeout(() => {
+            try { recognition.start(); } catch(err) {}
+          }, 300);
+        } else {
+          updateMicUI();
+        }
+      };
     }
 
-    function toggleListening(forceState) {
+    function startAlwaysOnListening() {
       if (!recognition) return;
-      isListening = forceState !== undefined ? forceState : !isListening;
-      const btn = document.getElementById('mic-btn');
-      if (isListening) {
-        btn.classList.add('listening');
+      keepMicActive = true;
+      try {
         recognition.start();
+      } catch(e) {}
+      updateMicUI();
+    }
+
+    function toggleListeningUserOverride() {
+      if (!recognition) return;
+      keepMicActive = !keepMicActive;
+      if (keepMicActive) {
+        try { recognition.start(); } catch(e) {}
+      } else {
+        try { recognition.stop(); } catch(e) {}
+      }
+      updateMicUI();
+    }
+
+    function updateMicUI() {
+      const btn = document.getElementById('mic-btn');
+      if (keepMicActive) {
+        btn.classList.add('listening');
+        btn.classList.remove('off');
+        btn.title = "Mic Always ON (Click to Pause)";
       } else {
         btn.classList.remove('listening');
-        try { recognition.stop(); } catch(e){}
+        btn.classList.add('off');
+        btn.title = "Mic OFF (Click to Resume)";
       }
     }
 
@@ -741,6 +856,7 @@
 
     window.onload = function() {
       updateScoreboardDisplay();
+      startAlwaysOnListening();
     };
   </script>
 </body>
