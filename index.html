@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Monster Math 21 - Mobile Voice Edition</title>
+  <title>Monster Math 21 - Always-On Voice Edition</title>
   <style>
     :root {
       --bg-color: #fefce8;
@@ -74,14 +74,14 @@
     .header-right {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.3rem;
     }
 
     .scoreboard {
       display: flex;
       gap: 0.4rem;
       background: #f1f5f9;
-      padding: 0.2rem 0.5rem;
+      padding: 0.2rem 0.4rem;
       border-radius: 8px;
       border: 2px solid var(--border-color);
       font-size: 0.75rem;
@@ -90,18 +90,6 @@
 
     .score-win { color: var(--success); }
     .score-loss { color: var(--danger); }
-
-    select {
-      background: #ffffff;
-      border: 2px solid var(--border-color);
-      color: var(--text);
-      padding: 0.2rem 0.4rem;
-      border-radius: 8px;
-      font-size: 0.75rem;
-      font-weight: bold;
-      outline: none;
-      max-width: 110px;
-    }
 
     .icon-btn {
       background: #fef08a;
@@ -112,6 +100,14 @@
       font-size: 0.8rem;
       cursor: pointer;
       box-shadow: 2px 2px 0px var(--border-color);
+    }
+
+    .icon-btn.active-toggle {
+      background: #86efac;
+    }
+
+    .icon-btn.muted-toggle {
+      background: #fca5a5;
     }
 
     .play-area {
@@ -219,11 +215,11 @@
     }
 
     .voice-status-bar {
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       text-align: center;
       color: var(--text-dim);
       font-weight: bold;
-      min-height: 1rem;
+      min-height: 1.1rem;
     }
 
     .controls {
@@ -272,7 +268,7 @@
       height: 44px;
       border-radius: 50%;
       border: 3px solid var(--border-color);
-      background: #e2e8f0;
+      background: #cbd5e1;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -347,7 +343,7 @@
           <span class="score-win" id="win-count">W: 0</span>
           <span class="score-loss" id="loss-count">L: 0</span>
         </div>
-        <select id="voice-select" onchange="saveVoice()"></select>
+        <button class="icon-btn active-toggle" id="tts-toggle-btn" onclick="toggleMuteTTS()" title="Mute/Unmute Barnaby Voice">🔊 Voice</button>
         <button class="icon-btn" onclick="openHelp()" title="Help">❓</button>
       </div>
     </header>
@@ -361,7 +357,7 @@
       <div class="card-container" id="dealer-cards"></div>
     </div>
 
-    <div class="status-banner" id="status-text">Tap anywhere to enable speech audio!</div>
+    <div class="status-banner" id="status-text">Tap anywhere or press DEAL to play!</div>
 
     <!-- Player Area -->
     <div class="play-area">
@@ -407,7 +403,7 @@
     let recognition = null;
     let isListeningWanted = true;
     let isSpeaking = false;
-    let availableVoices = [];
+    let isTTSMuted = localStorage.getItem('m21_tts_muted') === 'true';
     let speechTimer = null;
     let audioUnlocked = false;
 
@@ -415,6 +411,7 @@
     let wins = parseInt(localStorage.getItem('m21_wins') || '0');
     let losses = parseInt(localStorage.getItem('m21_losses') || '0');
     updateScoreboardDisplay();
+    updateMuteUI();
 
     // Web Audio FX
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -424,111 +421,115 @@
         audioCtx.resume();
       }
       if ('speechSynthesis' in window && !audioUnlocked) {
-        window.speechSynthesis.resume();
-        // Warm up speech synthesis engine with silent utterance
-        const silentUtterance = new SpeechSynthesisUtterance('');
-        window.speechSynthesis.speak(silentUtterance);
+        try {
+          window.speechSynthesis.resume();
+        } catch(e){}
         audioUnlocked = true;
       }
     }
 
     function playCardSound() {
       unlockAudio();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.08);
-      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.08);
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.08);
+      } catch(e){}
     }
 
     function playWinSound() {
       unlockAudio();
-      [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.08);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime + idx * 0.08);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.08 + 0.2);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(audioCtx.currentTime + idx * 0.08);
-        osc.stop(audioCtx.currentTime + idx * 0.08 + 0.2);
-      });
+      try {
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.08);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime + idx * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.08 + 0.2);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(audioCtx.currentTime + idx * 0.08);
+          osc.stop(audioCtx.currentTime + idx * 0.08 + 0.2);
+        });
+      } catch(e){}
     }
 
-    // Voice Selection Setup
-    function populateVoices() {
-      if (!('speechSynthesis' in window)) return;
-      availableVoices = window.speechSynthesis.getVoices();
-      const voiceSelect = document.getElementById('voice-select');
-      const saved = localStorage.getItem('m21_selected_voice');
-      voiceSelect.innerHTML = '';
-
-      const englishVoices = availableVoices.filter(v => v.lang.startsWith('en'));
-      (englishVoices.length ? englishVoices : availableVoices).forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = v.name;
-        opt.textContent = v.name.replace(/Google|Microsoft|Apple/g, '').trim();
-        if (saved && v.name === saved) opt.selected = true;
-        voiceSelect.appendChild(opt);
-      });
+    function toggleMuteTTS() {
+      isTTSMuted = !isTTSMuted;
+      localStorage.setItem('m21_tts_muted', isTTSMuted);
+      if (isTTSMuted && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        resumeRecognitionAfterSpeech();
+      }
+      updateMuteUI();
     }
 
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = populateVoices;
-      populateVoices();
-    }
-
-    function saveVoice() {
-      localStorage.setItem('m21_selected_voice', document.getElementById('voice-select').value);
+    function updateMuteUI() {
+      const btn = document.getElementById('tts-toggle-btn');
+      if (isTTSMuted) {
+        btn.textContent = '🔇 Muted';
+        btn.className = 'icon-btn muted-toggle';
+      } else {
+        btn.textContent = '🔊 Voice';
+        btn.className = 'icon-btn active-toggle';
+      }
     }
 
     function speak(text, callback) {
       unlockAudio();
-      if (!('speechSynthesis' in window)) {
+      
+      // If user muted TTS or TTS is unsupported, don't stall listening loop
+      if (isTTSMuted || !('speechSynthesis' in window)) {
+        resumeRecognitionAfterSpeech();
         if (callback) callback();
         return;
       }
 
-      window.speechSynthesis.cancel();
+      // Pre-clear any stuck synthesis
+      try { window.speechSynthesis.cancel(); } catch(e){}
+      
       pauseRecognitionForSpeech();
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      const voiceName = document.getElementById('voice-select').value;
-      const voice = availableVoices.find(v => v.name === voiceName);
-      if (voice) utterance.voice = voice;
-
-      utterance.pitch = 1.0;
-      utterance.rate = 0.95;
-
+      let finished = false;
       const finishSpeech = () => {
+        if (finished) return;
+        finished = true;
         if (speechTimer) clearTimeout(speechTimer);
         resumeRecognitionAfterSpeech();
         if (callback) callback();
       };
 
-      utterance.onend = finishSpeech;
-      utterance.onerror = finishSpeech;
+      try {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.pitch = 1.0;
+        utterance.rate = 1.0;
 
-      // Safety fallback: ensure mic turns green after 4 seconds even if speech gets blocked/stuck
-      speechTimer = setTimeout(() => {
+        utterance.onend = finishSpeech;
+        utterance.onerror = finishSpeech;
+
+        // CRITICAL FIX: Guarantee release after 1.5s max so recognition never deadlocks
+        speechTimer = setTimeout(() => {
+          finishSpeech();
+        }, 1500);
+
+        window.speechSynthesis.speak(utterance);
+      } catch(e) {
         finishSpeech();
-      }, 4000);
-
-      window.speechSynthesis.speak(utterance);
+      }
     }
 
     function speakHelpCommands() {
       speak("You can say: Hit, Stay, Deal, Double, Surrender, or Help.");
     }
 
-    // Speech Recognition Logic
     function pauseRecognitionForSpeech() {
       isSpeaking = true;
       updateMicUI('paused', "📢 Barnaby Talking...");
@@ -630,7 +631,6 @@
       }
     }
 
-    // Game Rules Logic
     function buildDeck() {
       deck = [];
       for (let s of suits) {
@@ -696,7 +696,7 @@
       const score = calculateScore(playerHand);
       const msg = `You have ${score}! What would you like to do?`;
       document.getElementById('status-text').textContent = msg;
-      speak(msg);
+      speak("What would you like to do?");
     }
 
     function hit() {
@@ -710,7 +710,7 @@
         gameActive = false;
         recordLoss();
         document.getElementById('status-text').textContent = `Bust with ${score}! Barnaby Wins!`;
-        speak(`Oh no! You have ${score}. That's over 21!`);
+        speak(`Over 21! Barnaby wins.`);
         endGame();
       } else if (score === 21) {
         speak(`Awesome! 21!`);
@@ -718,7 +718,7 @@
       } else {
         const msg = `You have ${score}! What would you like to do?`;
         document.getElementById('status-text').textContent = msg;
-        speak(msg);
+        speak("What would you like to do?");
       }
     }
 
@@ -753,19 +753,24 @@
       const dScore = calculateScore(dealerHand);
 
       let winnerMsg = "";
+      let speechMsg = "";
+
       if (dScore > 21 || pScore > dScore) {
         recordWin();
         winnerMsg = `Yay! You win with ${pScore}! 🎉`;
+        speechMsg = `You win with ${pScore}!`;
         playWinSound();
       } else if (pScore === dScore) {
         winnerMsg = `It's a tie at ${pScore}!`;
+        speechMsg = `It is a tie!`;
       } else {
         recordLoss();
         winnerMsg = `Barnaby Bear wins with ${dScore}!`;
+        speechMsg = `Barnaby wins with ${dScore}.`;
       }
 
       document.getElementById('status-text').textContent = winnerMsg;
-      speak(winnerMsg);
+      speak(speechMsg);
       endGame();
     }
 
