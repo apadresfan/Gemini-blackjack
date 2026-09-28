@@ -1,886 +1,612 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monster Math 21 - Kids Voice Blackjack</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Mali:wght@600;700&display=swap" rel="stylesheet">
-    <!-- Canvas Confetti -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monster Math 21 - Kids Voice Card Game</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --primary: #8b5cf6;
+      --primary-hover: #7c3aed;
+      --accent: #f59e0b;
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        playpen: '#FF5252',
-                        sunshine: '#FFD54F',
-                        bubblegum: '#FF4081',
-                        sky: '#40C4FF',
-                        limey: '#69F0AE',
-                        purplepop: '#E040FB'
-                    },
-                    fontFamily: {
-                        kids: ['"Fredoka One"', 'cursive', 'sans-serif'],
-                        friendly: ['"Mali"', 'cursive', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Fredoka', 'Comic Sans MS', cursive, sans-serif;
+    }
 
-    <style>
-        body {
-            background: linear-gradient(135deg, #40C4FF 0%, #E040FB 50%, #FF4081 100%);
-            font-family: 'Fredoka One', cursive, sans-serif;
-            user-select: none;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
+    body {
+      background: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      user-select: none;
+    }
 
-        .bounce-btn {
-            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.15s ease;
-            box-shadow: 0 8px 0px rgba(0,0,0,0.25);
-        }
+    header {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1.25rem;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 1rem;
+    }
 
-        .bounce-btn:hover {
-            transform: translateY(-4px) scale(1.04);
-            box-shadow: 0 12px 0px rgba(0,0,0,0.25);
-        }
+    h1 {
+      font-size: 1.6rem;
+      color: var(--accent);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
 
-        .bounce-btn:active {
-            transform: translateY(4px) scale(0.97);
-            box-shadow: 0 2px 0px rgba(0,0,0,0.25);
-        }
+    .header-btns {
+      display: flex;
+      gap: 0.5rem;
+    }
 
-        .kid-card {
-            perspective: 1000px;
-            width: 95px;
-            height: 135px;
-        }
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.6rem 1rem;
+      border-radius: 0.75rem;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
 
-        @media (min-width: 640px) {
-            .kid-card {
-                width: 125px;
-                height: 175px;
-            }
-        }
+    button:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+    }
 
-        .card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-style: preserve-3d;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.25);
-        }
+    button:active {
+      transform: translateY(0);
+    }
 
-        .kid-card.flipped .card-inner {
-            transform: rotateY(180deg);
-        }
+    .game-board {
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      flex: 1;
+    }
 
-        .card-front, .card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 20px;
-            border: 4px solid #ffffff;
-            overflow: hidden;
-        }
+    .play-area {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 1.5rem;
+      padding: 1.25rem;
+      border: 2px dashed rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
 
-        .card-front {
-            background: #ffffff;
-            transform: rotateY(180deg);
-        }
+    .area-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        .card-back {
-            background: linear-gradient(135deg, #FF5252, #FFD54F);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .avatar-tag {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
 
-        @keyframes float-star {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(10deg); }
-        }
+    .score-badge {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.4rem 0.8rem;
+      border-radius: 1rem;
+      font-size: 1.1rem;
+      color: var(--accent);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
 
-        .floating-star {
-            animation: float-star 2.5s infinite ease-in-out;
-        }
+    .card-container {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      min-height: 125px;
+      align-items: center;
+    }
 
-        @keyframes wobble {
-            0%, 100% { transform: rotate(-4deg); }
-            50% { transform: rotate(4deg); }
-        }
+    .card {
+      width: 85px;
+      height: 120px;
+      background: white;
+      color: #1e293b;
+      border-radius: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 0.5rem;
+      font-weight: bold;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
 
-        .wobbly {
-            animation: wobble 2s infinite ease-in-out;
-        }
-    </style>
+    @keyframes popIn {
+      0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    .card.back {
+      background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+      color: white;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.2rem;
+    }
+
+    .card-val {
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+
+    .card-suit {
+      font-size: 1.8rem;
+      align-self: center;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-hit { background: var(--success); font-size: 1.2rem; padding: 0.8rem 1.5rem; }
+    .btn-hit:hover { background: #059669; }
+
+    .btn-stand { background: var(--danger); font-size: 1.2rem; padding: 0.8rem 1.5rem; }
+    .btn-stand:hover { background: #dc2626; }
+
+    .btn-deal { background: var(--accent); color: #0f172a; font-size: 1.3rem; padding: 0.8rem 2rem; }
+    .btn-deal:hover { background: #d97706; }
+
+    .mic-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      width: 55px;
+      height: 55px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .mic-btn.listening {
+      background: var(--danger);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .status-msg {
+      text-align: center;
+      font-size: 1.35rem;
+      min-height: 2.5rem;
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #1e293b;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      width: 90%;
+      max-width: 500px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    label { font-size: 0.95rem; color: var(--text-dim); }
+
+    select {
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.7rem;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="flex flex-col justify-between p-3 sm:p-5 text-white min-h-screen">
+<body>
 
-    <header class="w-full max-w-5xl mx-auto flex items-center justify-between gap-2 p-3 bg-white/20 backdrop-blur-md rounded-3xl border-4 border-white/60 shadow-xl">
-        <div class="flex items-center gap-2 sm:gap-3">
-            <button onclick="cycleAvatar()" class="w-12 h-12 rounded-2xl bg-sunshine flex items-center justify-center text-3xl shadow-inner border-2 border-white wobbly bounce-btn" title="Click to change dealer avatar!">
-                <span id="current-avatar-emoji">🐻</span>
-            </button>
-            <div>
-                <h1 class="text-lg sm:text-2xl font-black text-sunshine drop-shadow-md tracking-wider">MONSTER MATH 21</h1>
-                <p class="text-[10px] sm:text-xs text-white/90 font-friendly font-bold">Dealer: <span id="current-avatar-name">Barnaby Bear</span></p>
-            </div>
-        </div>
+  <header>
+    <h1>👾 Monster Math 21</h1>
+    <div class="header-btns">
+      <button onclick="toggleVoice()"><span id="voice-icon">🔊</span> Voice On</button>
+      <button onclick="openSettings()">🎙️ Voice Selection</button>
+    </div>
+  </header>
 
-        <!-- Dynamic API / Audio Status Badge -->
-        <div id="audio-status-badge" class="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-white/30 rounded-full border border-white/60 text-[11px] font-friendly font-bold">
-            <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-limey"></span>
-            <span id="status-text">Native Speech Active</span>
-        </div>
-
-        <div class="flex items-center gap-2">
-            <div class="flex items-center gap-1.5 bg-amber-400 text-purple-950 px-3 py-1.5 rounded-2xl border-4 border-white shadow-md">
-                <span class="text-xl floating-star">⭐</span>
-                <span id="star-count" class="text-xl font-black">10</span>
-            </div>
-
-            <!-- Settings Gear Button -->
-            <button onclick="openSettingsModal()" class="w-11 h-11 rounded-2xl bg-purplepop hover:bg-purple-600 border-4 border-white flex items-center justify-center text-white text-lg bounce-btn shadow-lg" title="Voice & API Settings">
-                <i class="fas fa-gear"></i>
-            </button>
-        </div>
-    </header>
-
-    <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 p-4">
-        <div class="bg-gradient-to-b from-sky to-purplepop border-4 border-white rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl text-white relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeSettingsModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-playpen border-2 border-white text-white font-bold text-lg flex items-center justify-center bounce-btn">
-                ✕
-            </button>
-
-            <div class="flex items-center gap-3 mb-4">
-                <span class="text-3xl">🔊</span>
-                <div>
-                    <h3 class="text-xl sm:text-2xl font-black text-sunshine">Voice & API Setup</h3>
-                    <p class="text-xs text-white/90 font-friendly">Configure natural voice APIs for the dealer!</p>
-                </div>
-            </div>
-
-            <!-- Status Alert Container in Settings -->
-            <div id="modal-alert-box" class="hidden mb-3 p-3 rounded-2xl bg-playpen/90 text-white border-2 border-white text-xs font-friendly font-bold leading-tight flex items-start gap-2">
-                <i class="fas fa-circle-exclamation text-base mt-0.5"></i>
-                <span id="modal-alert-msg">API Error occurred.</span>
-            </div>
-
-            <div class="space-y-4 font-friendly font-bold text-xs sm:text-sm">
-                <div>
-                    <label class="block mb-1 text-sunshine uppercase text-[11px]">Voice Engine Provider</label>
-                    <select id="voice-provider-select" onchange="toggleProviderSections()" class="w-full p-3 rounded-2xl bg-white text-purple-900 font-bold border-2 border-yellow-300 focus:outline-none">
-                        <option value="web">🗣️ Browser Native Speech (Free & Built-in)</option>
-                        <option value="elevenlabs">🎙️ ElevenLabs API (Ultra-Realistic)</option>
-                        <option value="fish">🐟 Fish.Audio API (Natural Neural TTS)</option>
-                    </select>
-                </div>
-
-                <!-- ElevenLabs Configuration Section -->
-                <div id="eleven-section" class="hidden space-y-2 p-3 bg-white/20 rounded-2xl border-2 border-white">
-                    <label class="block text-[11px] uppercase text-sunshine">ElevenLabs API Key (`xi-api-key`)</label>
-                    <input type="password" id="eleven-key" placeholder="e.g. sk_12345..." class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
-                    
-                    <label class="block text-[11px] uppercase text-sunshine">Model ID</label>
-                    <select id="eleven-model" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-bold border-2 border-yellow-300 focus:outline-none text-xs">
-                        <option value="eleven_flash_v2_5" selected>⚡ eleven_flash_v2_5 (Fastest & Ultra Low Latency)</option>
-                        <option value="eleven_multilingual_v2">🌐 eleven_multilingual_v2 (High Quality Multi-language)</option>
-                        <option value="eleven_v3">🌟 eleven_v3 (Expressive & Natural)</option>
-                    </select>
-
-                    <label class="block text-[11px] uppercase text-sunshine">Voice ID (Optional)</label>
-                    <input type="text" id="eleven-voice" placeholder="e.g. 21m00Tcm4TlvDq8ikWAM (Rachel default)" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
-                </div>
-
-                <!-- Fish.Audio Configuration Section -->
-                <div id="fish-section" class="hidden space-y-2 p-3 bg-white/20 rounded-2xl border-2 border-white">
-                    <label class="block text-[11px] uppercase text-sunshine">Fish.Audio API Key (Bearer Token)</label>
-                    <input type="password" id="fish-key" placeholder="e.g. 8a7b6c..." class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
-                    
-                    <label class="block text-[11px] uppercase text-sunshine">Voice / Reference ID (Optional)</label>
-                    <input type="text" id="fish-voice" placeholder="e.g. 7f92f8afb8ec43bf81429cc1c9199cb1" class="w-full p-2.5 rounded-xl bg-white text-purple-900 font-mono text-xs focus:outline-none">
-                </div>
-
-                <div class="pt-2 flex gap-2">
-                    <button onclick="testVoice()" class="px-4 py-3 bg-sunshine text-purple-900 rounded-2xl font-black text-xs sm:text-sm border-2 border-white bounce-btn">
-                        Test Voice 📣
-                    </button>
-                    <button onclick="saveVoiceSettings()" class="flex-1 py-3 bg-limey text-purple-950 rounded-2xl font-black text-xs sm:text-sm border-2 border-white bounce-btn">
-                        Save Settings 🎉
-                    </button>
-                </div>
-            </div>
-        </div>
+  <div class="game-board">
+    <!-- Dealer Area -->
+    <div class="play-area">
+      <div class="area-header">
+        <div class="avatar-tag">🐻 Barnaby Bear</div>
+        <div class="score-badge" id="dealer-score">Score: ?</div>
+      </div>
+      <div class="card-container" id="dealer-cards"></div>
     </div>
 
-    <main class="w-full max-w-4xl mx-auto my-2 sm:my-4 flex-1 flex flex-col justify-between p-3 sm:p-5 bg-white/25 backdrop-blur-md rounded-3xl border-4 border-white/60 shadow-2xl relative min-h-[450px]">
+    <div class="status-msg" id="status-text">Press DEAL to play!</div>
+
+    <!-- Player Area -->
+    <div class="play-area">
+      <div class="area-header">
+        <div class="avatar-tag">⭐ You</div>
+        <div class="score-badge" id="player-score">Score: 0</div>
+      </div>
+      <div class="card-container" id="player-cards"></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn-deal" id="btn-deal" onclick="startNewGame()">🎮 DEAL</button>
+      <button class="btn-hit" id="btn-hit" onclick="hit()" disabled>➕ ANOTHER CARD</button>
+      <button class="btn-stand" id="btn-stand" onclick="stand()" disabled>✋ STAY</button>
+      <button class="mic-btn" id="mic-btn" onclick="toggleListening()" title="Speak Command">🎙️</button>
+    </div>
+  </div>
+
+  <!-- Voice Settings Modal -->
+  <div class="modal" id="settings-modal">
+    <div class="modal-content">
+      <h2>🎙️ Choose Dealer Voice</h2>
+      <p style="font-size:0.9rem; color: var(--text-dim);">Select from your device's realistic neural voices for free:</p>
+
+      <div class="form-group">
+        <label>Installed Realistic Voice</label>
+        <select id="voice-select"></select>
+      </div>
+
+      <button onclick="testVoice()">🔊 Test Selected Voice</button>
+      <button onclick="closeSettings()" style="background: var(--accent); color: #0f172a;">Save & Play</button>
+    </div>
+  </div>
+
+  <script>
+    const suits = ['🍎', '⭐', '🎈', '🐶'];
+    let deck = [], playerHand = [], dealerHand = [];
+    let gameActive = false;
+    let voiceEnabled = true;
+    let recognition = null;
+    let isListening = false;
+    let availableVoices = [];
+
+    // Synthesize Card & Fanfare Sound Effects via Web Audio API
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playCardSound() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.08);
+    }
+
+    function playWinSound() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime + idx * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.1 + 0.25);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + idx * 0.1);
+        osc.stop(audioCtx.currentTime + idx * 0.1 + 0.25);
+      });
+    }
+
+    // Populate Device Realistic Natural Voices
+    function loadVoices() {
+      if ('speechSynthesis' in window) {
+        availableVoices = window.speechSynthesis.getVoices();
+        const voiceSelect = document.getElementById('voice-select');
+        voiceSelect.innerHTML = '';
         
-        <!-- Speech Bubble -->
-        <div id="speech-bubble" class="absolute top-2 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-sunshine text-purple-950 font-bold text-xs sm:text-sm border-4 border-white shadow-lg transition-all duration-300 opacity-0 pointer-events-none z-30 flex items-center gap-2 max-w-[90%] text-center">
-            <span>💬</span>
-            <span id="speech-bubble-text">"Say CARD or STAY!"</span>
+        // Filter and prioritize high-quality/natural voices
+        const sortedVoices = availableVoices.sort((a, b) => {
+          if (a.name.includes('Natural') || a.name.includes('Enhanced') || a.name.includes('Google') || a.name.includes('Siri')) return -1;
+          return 1;
+        });
+
+        sortedVoices.forEach((voice, index) => {
+          if (voice.lang.startsWith('en')) {
+            const opt = document.createElement('option');
+            opt.value = voice.name;
+            opt.textContent = `${voice.name} (${voice.lang})`;
+            voiceSelect.appendChild(opt);
+          }
+        });
+      }
+    }
+
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+      loadVoices();
+    }
+
+    function buildDeck() {
+      deck = [];
+      for (let s of suits) {
+        for (let v = 1; v <= 10; v++) {
+          deck.push({ value: v, suit: s, label: v === 1 ? 'A' : v });
+        }
+      }
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+    }
+
+    function calculateScore(hand) {
+      let sum = 0;
+      let aces = 0;
+      for (let card of hand) {
+        if (card.value === 1) {
+          aces++;
+          sum += 11;
+        } else {
+          sum += card.value;
+        }
+      }
+      while (sum > 21 && aces > 0) {
+        sum -= 10;
+        aces--;
+      }
+      return sum;
+    }
+
+    function speak(text) {
+      if (!voiceEnabled || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      const selectedVoiceName = document.getElementById('voice-select').value;
+      const voice = availableVoices.find(v => v.name === selectedVoiceName);
+      
+      if (voice) {
+        utterance.voice = voice;
+      }
+      utterance.pitch = 1.0;
+      utterance.rate = 0.95;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function renderCards() {
+      const pContainer = document.getElementById('player-cards');
+      const dContainer = document.getElementById('dealer-cards');
+
+      pContainer.innerHTML = playerHand.map(c => `
+        <div class="card">
+          <div class="card-val">${c.label}</div>
+          <div class="card-suit">${c.suit}</div>
+          <div class="card-val" style="align-self: flex-end;">${c.label}</div>
         </div>
+      `).join('');
 
-        <!-- DEALER SECTION -->
-        <section class="flex flex-col items-center justify-start gap-1">
-            <div class="flex items-center gap-2">
-                <div class="w-9 h-9 rounded-full bg-limey flex items-center justify-center text-xl border-2 border-white wobbly shadow">
-                    <span id="dealer-avatar-icon">🐻</span>
-                </div>
-                <span id="dealer-name-label" class="text-sm sm:text-base font-black text-sunshine drop-shadow">Barnaby Bear</span>
-                <span id="dealer-score" class="px-3 py-0.5 bg-white text-purple-900 rounded-full font-black text-xs border-2 border-yellow-300 shadow hidden">0</span>
-            </div>
-
-            <!-- Dealer Cards Container -->
-            <div id="dealer-cards" class="flex justify-center items-center gap-2 py-2 min-h-[140px]"></div>
-        </section>
-
-        <!-- CENTER MATH HELPER & BANNER -->
-        <div class="relative my-1 flex flex-col items-center justify-center text-center">
-            <div id="math-helper" class="mb-2 px-4 py-1.5 bg-white/90 text-purple-950 rounded-full font-black text-xs sm:text-sm border-2 border-purple-300 shadow flex items-center gap-2">
-                <span>🧮 Math Helper:</span>
-                <span id="math-equation-text" class="text-purple-700">0 = 0</span>
-            </div>
-
-            <div id="game-banner" class="p-3 sm:p-4 rounded-3xl bg-sunshine text-purple-950 border-4 border-white shadow-2xl transition-all duration-300 scale-90 opacity-0 pointer-events-none max-w-sm w-full z-20">
-                <h2 id="banner-title" class="text-xl sm:text-3xl font-black uppercase">21! PERFECT MATH! ⭐</h2>
-                <p id="banner-subtitle" class="text-xs sm:text-sm font-friendly font-bold mt-1 text-purple-900">Target score reached!</p>
-            </div>
-        </div>
-
-        <!-- PLAYER SECTION -->
-        <section class="flex flex-col items-center justify-end gap-1">
-            <!-- Player Cards Container -->
-            <div id="player-cards" class="flex justify-center items-center gap-2 py-2 min-h-[140px]"></div>
-
-            <div class="flex items-center gap-2">
-                <span class="text-sm sm:text-base font-black text-sunshine drop-shadow">Your Magic Hand</span>
-                <span id="player-score" class="px-3 py-0.5 bg-white text-purple-900 rounded-full font-black text-xs border-2 border-yellow-300 shadow hidden">0</span>
-            </div>
-        </section>
-    </main>
-
-    <footer class="w-full max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-white/20 backdrop-blur-md rounded-3xl border-4 border-white/50 shadow-xl">
-        <!-- Microphone Toggle -->
-        <button id="mic-btn" onclick="toggleVoiceRecognition()" class="w-full sm:w-auto px-4 py-3 rounded-2xl bg-playpen hover:bg-red-500 border-4 border-white flex items-center justify-center gap-3 bounce-btn text-white shadow-lg">
-            <i id="mic-icon" class="fas fa-microphone text-xl sm:text-2xl"></i>
-            <div class="text-left">
-                <span id="mic-label" class="block text-xs sm:text-sm font-black">TALK TO DEALER</span>
-                <span class="block text-[9px] sm:text-[10px] font-friendly font-bold text-white/80">Say "Card" or "Stay"</span>
-            </div>
-        </button>
-
-        <!-- Controls -->
-        <div id="game-controls" class="flex items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <button id="btn-hit" onclick="playerHit()" class="flex-1 sm:flex-none px-4 sm:px-6 py-3.5 rounded-2xl bg-limey text-purple-950 font-black text-sm sm:text-base border-4 border-white bounce-btn shadow-lg flex items-center justify-center gap-1.5">
-                <span>➕</span> CARD / HIT
-            </button>
-            <button id="btn-stand" onclick="playerStand()" class="flex-1 sm:flex-none px-4 sm:px-6 py-3.5 rounded-2xl bg-sunshine text-purple-950 font-black text-sm sm:text-base border-4 border-white bounce-btn shadow-lg flex items-center justify-center gap-1.5">
-                <span>✋</span> STAY
-            </button>
-            <button id="btn-deal" onclick="startNewHand()" class="hidden px-8 py-3.5 rounded-2xl bg-purplepop text-white font-black text-base sm:text-lg border-4 border-white bounce-btn shadow-lg">
-                PLAY AGAIN! 🎈
-            </button>
-        </div>
-    </footer>
-
-    <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-        function playKidSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const now = audioCtx.currentTime;
-
-            if (type === 'pop') {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(320, now);
-                osc.frequency.exponentialRampToValueAtTime(850, now + 0.08);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(now);
-                osc.stop(now + 0.08);
-            } else if (type === 'win') {
-                confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
-                [392, 523, 659, 783, 1046].forEach((freq, i) => {
-                    const o = audioCtx.createOscillator();
-                    const g = audioCtx.createGain();
-                    o.type = 'triangle';
-                    o.frequency.setValueAtTime(freq, now + i * 0.07);
-                    g.connect(audioCtx.destination);
-                    o.connect(g);
-                    g.gain.setValueAtTime(0.2, now + i * 0.07);
-                    g.gain.linearRampToValueAtTime(0.01, now + i * 0.07 + 0.2);
-                    o.start(now + i * 0.07);
-                    o.stop(now + i * 0.07 + 0.2);
-                });
-            } else if (type === 'oops') {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(260, now);
-                osc.frequency.linearRampToValueAtTime(120, now + 0.3);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(now);
-                osc.stop(now + 0.3);
-            }
+      dContainer.innerHTML = dealerHand.map((c, idx) => {
+        if (idx === 1 && gameActive) {
+          return `<div class="card back">❓</div>`;
         }
+        return `
+          <div class="card">
+            <div class="card-val">${c.label}</div>
+            <div class="card-suit">${c.suit}</div>
+            <div class="card-val" style="align-self: flex-end;">${c.label}</div>
+          </div>
+        `;
+      }).join('');
 
-        const DEALER_AVATARS = [
-            { name: "Barnaby Bear", emoji: "🐻" },
-            { name: "Sparky Dragon", emoji: "🐲" },
-            { name: "Pip Bunny", emoji: "🐰" }
-        ];
-        let avatarIndex = 0;
+      const pScore = calculateScore(playerHand);
+      document.getElementById('player-score').textContent = `Score: ${pScore}`;
 
-        function cycleAvatar() {
-            avatarIndex = (avatarIndex + 1) % DEALER_AVATARS.length;
-            updateAvatarUI();
-            speakDealerText("Hi! I am " + DEALER_AVATARS[avatarIndex].name + "! Let's count to 21!");
+      if (gameActive) {
+        document.getElementById('dealer-score').textContent = `Score: ?`;
+      } else {
+        document.getElementById('dealer-score').textContent = `Score: ${calculateScore(dealerHand)}`;
+      }
+    }
+
+    function startNewGame() {
+      buildDeck();
+      playCardSound();
+      playerHand = [deck.pop(), deck.pop()];
+      dealerHand = [deck.pop(), deck.pop()];
+      gameActive = true;
+
+      document.getElementById('btn-hit').disabled = false;
+      document.getElementById('btn-stand').disabled = false;
+      document.getElementById('btn-deal').disabled = true;
+
+      renderCards();
+      const score = calculateScore(playerHand);
+      const msg = `You have ${score}! Do you want another card or stay?`;
+      document.getElementById('status-text').textContent = msg;
+      speak(msg);
+    }
+
+    function hit() {
+      if (!gameActive) return;
+      playCardSound();
+      playerHand.push(deck.pop());
+      renderCards();
+
+      const score = calculateScore(playerHand);
+      if (score > 21) {
+        gameActive = false;
+        document.getElementById('status-text').textContent = `Oh no, you went over 21! Barnaby wins!`;
+        speak(`Oh no! You have ${score}. That's over 21!`);
+        endGame();
+      } else if (score === 21) {
+        speak(`Awesome! You hit 21!`);
+        stand();
+      } else {
+        const msg = `You have ${score}! Another card?`;
+        document.getElementById('status-text').textContent = msg;
+        speak(msg);
+      }
+    }
+
+    function stand() {
+      if (!gameActive) return;
+      gameActive = false;
+
+      while (calculateScore(dealerHand) < 17) {
+        dealerHand.push(deck.pop());
+      }
+
+      playCardSound();
+      renderCards();
+
+      const pScore = calculateScore(playerHand);
+      const dScore = calculateScore(dealerHand);
+
+      let winnerMsg = "";
+      if (dScore > 21 || pScore > dScore) {
+        winnerMsg = `Yay! You win with ${pScore}! 🎉`;
+        playWinSound();
+      } else if (pScore === dScore) {
+        winnerMsg = `It's a tie! Both have ${pScore}!`;
+      } else {
+        winnerMsg = `Barnaby Bear wins with ${dScore}! Good try!`;
+      }
+
+      document.getElementById('status-text').textContent = winnerMsg;
+      speak(winnerMsg);
+      endGame();
+    }
+
+    function endGame() {
+      document.getElementById('btn-hit').disabled = true;
+      document.getElementById('btn-stand').disabled = true;
+      document.getElementById('btn-deal').disabled = false;
+    }
+
+    // Hands-Free Speech Control
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = (event) => {
+        const cmd = event.results[0][0].transcript.toLowerCase();
+        if (cmd.includes('hit') || cmd.includes('card') || cmd.includes('more')) {
+          hit();
+        } else if (cmd.includes('stay') || cmd.includes('stand') || cmd.includes('stop')) {
+          stand();
+        } else if (cmd.includes('deal') || cmd.includes('start') || cmd.includes('play')) {
+          startNewGame();
         }
-
-        function updateAvatarUI() {
-            const current = DEALER_AVATARS[avatarIndex];
-            document.getElementById('current-avatar-emoji').textContent = current.emoji;
-            document.getElementById('current-avatar-name').textContent = current.name;
-            document.getElementById('dealer-avatar-icon').textContent = current.emoji;
-            document.getElementById('dealer-name-label').textContent = current.name;
-        }
-
-        let activeProvider = 'web';
-        let fishApiKey = '';
-        let fishVoiceId = '';
-        let elevenApiKey = '';
-        let elevenVoiceId = '';
-        let elevenModelId = 'eleven_flash_v2_5';
-        let currentAudio = null;
-        const synth = window.speechSynthesis;
-
-        function loadSavedSettings() {
-            activeProvider = localStorage.getItem('m21_provider') || 'web';
-            fishApiKey = localStorage.getItem('m21_fish_key') || '';
-            fishVoiceId = localStorage.getItem('m21_fish_voice') || '';
-            elevenApiKey = localStorage.getItem('m21_eleven_key') || '';
-            elevenVoiceId = localStorage.getItem('m21_eleven_voice') || '';
-            elevenModelId = localStorage.getItem('m21_eleven_model') || 'eleven_flash_v2_5';
-
-            document.getElementById('voice-provider-select').value = activeProvider;
-            document.getElementById('fish-key').value = fishApiKey;
-            document.getElementById('fish-voice').value = fishVoiceId;
-            document.getElementById('eleven-key').value = elevenApiKey;
-            document.getElementById('eleven-voice').value = elevenVoiceId;
-            document.getElementById('eleven-model').value = elevenModelId;
-
-            toggleProviderSections();
-            updateStatusBadge();
-        }
-
-        function saveVoiceSettings() {
-            activeProvider = document.getElementById('voice-provider-select').value;
-            fishApiKey = document.getElementById('fish-key').value.trim();
-            fishVoiceId = document.getElementById('fish-voice').value.trim();
-            elevenApiKey = document.getElementById('eleven-key').value.trim();
-            elevenVoiceId = document.getElementById('eleven-voice').value.trim();
-            elevenModelId = document.getElementById('eleven-model').value;
-
-            localStorage.setItem('m21_provider', activeProvider);
-            localStorage.setItem('m21_fish_key', fishApiKey);
-            localStorage.setItem('m21_fish_voice', fishVoiceId);
-            localStorage.setItem('m21_eleven_key', elevenApiKey);
-            localStorage.setItem('m21_eleven_voice', elevenVoiceId);
-            localStorage.setItem('m21_eleven_model', elevenModelId);
-
-            clearModalAlert();
-            updateStatusBadge();
-            closeSettingsModal();
-            speakDealerText("Settings saved! Ready to play math 21!");
-        }
-
-        function toggleProviderSections() {
-            const provider = document.getElementById('voice-provider-select').value;
-            document.getElementById('fish-section').classList.toggle('hidden', provider !== 'fish');
-            document.getElementById('eleven-section').classList.toggle('hidden', provider !== 'elevenlabs');
-        }
-
-        function openSettingsModal() {
-            clearModalAlert();
-            const modal = document.getElementById('settings-modal');
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            modal.classList.add('opacity-100');
-        }
-
-        function closeSettingsModal() {
-            const modal = document.getElementById('settings-modal');
-            modal.classList.add('opacity-0', 'pointer-events-none');
-            modal.classList.remove('opacity-100');
-        }
-
-        function showModalAlert(msg) {
-            const box = document.getElementById('modal-alert-box');
-            document.getElementById('modal-alert-msg').textContent = msg;
-            box.classList.remove('hidden');
-        }
-
-        function clearModalAlert() {
-            document.getElementById('modal-alert-box').classList.add('hidden');
-        }
-
-        function updateStatusBadge(isError = false, errMsg = '') {
-            const dot = document.getElementById('status-dot');
-            const txt = document.getElementById('status-text');
-
-            if (isError) {
-                dot.className = "w-2.5 h-2.5 rounded-full bg-playpen animate-pulse";
-                txt.textContent = "API Fallback (Native Active)";
-                return;
-            }
-
-            dot.className = "w-2.5 h-2.5 rounded-full bg-limey";
-            if (activeProvider === 'elevenlabs') txt.textContent = "ElevenLabs Active";
-            else if (activeProvider === 'fish') txt.textContent = "Fish.Audio Active";
-            else txt.textContent = "Native Speech Active";
-        }
-
-        function speakWebSpeech(text) {
-            if (!synth) return;
-            synth.cancel();
-            const utt = new SpeechSynthesisUtterance(text);
-            utt.pitch = 1.2;
-            utt.rate = 1.0;
-            synth.speak(utt);
-        }
-
-        async function speakDealerText(text) {
-            showSpeechBubble(text);
-
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio = null;
-            }
-
-            // ELEVENLABS AUDIO SYNTHESIS
-            if (activeProvider === 'elevenlabs') {
-                if (!elevenApiKey) {
-                    showModalAlert("ElevenLabs API Key is missing!");
-                    updateStatusBadge(true);
-                    speakWebSpeech(text);
-                    return;
-                }
-
-                const voiceId = elevenVoiceId || '21m00Tcm4TlvDq8ikWAM';
-                const selectedModel = elevenModelId || 'eleven_flash_v2_5';
-                const endpoint = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
-
-                try {
-                    const response = await fetch(endpoint, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'xi-api-key': elevenApiKey
-                        },
-                        body: JSON.stringify({
-                            text: text,
-                            model_id: selectedModel
-                        })
-                    });
-
-                    if (!response.ok) {
-                        const errData = await response.json().catch(() => ({}));
-                        const msg = errData.detail?.message || `ElevenLabs Error HTTP ${response.status}`;
-                        showModalAlert(msg);
-                        updateStatusBadge(true);
-                        speakWebSpeech(text);
-                        return;
-                    }
-
-                    const arrayBuffer = await response.arrayBuffer();
-                    const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
-                    const url = URL.createObjectURL(blob);
-                    currentAudio = new Audio(url);
-                    currentAudio.play();
-                    updateStatusBadge(false);
-                    return;
-                } catch (err) {
-                    console.error("ElevenLabs Fetch Exception:", err);
-                    showModalAlert("ElevenLabs Network / CORS Error: " + err.message);
-                    updateStatusBadge(true);
-                    speakWebSpeech(text);
-                    return;
-                }
-            }
-
-            // FISH.AUDIO SYNTHESIS
-            if (activeProvider === 'fish') {
-                if (!fishApiKey) {
-                    showModalAlert("Fish.Audio API Key is missing!");
-                    updateStatusBadge(true);
-                    speakWebSpeech(text);
-                    return;
-                }
-
-                const endpoint = 'https://api.fish.audio/v1/tts';
-                const payload = { text: text };
-                if (fishVoiceId) payload.reference_id = fishVoiceId;
-
-                try {
-                    const response = await fetch(endpoint, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + fishApiKey
-                        },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        const errText = await response.text().catch(() => '');
-                        showModalAlert(`Fish.Audio Error HTTP ${response.status}: ${errText.slice(0,60)}`);
-                        updateStatusBadge(true);
-                        speakWebSpeech(text);
-                        return;
-                    }
-
-                    const arrayBuffer = await response.arrayBuffer();
-                    const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
-                    const url = URL.createObjectURL(blob);
-                    currentAudio = new Audio(url);
-                    currentAudio.play();
-                    updateStatusBadge(false);
-                    return;
-                } catch (err) {
-                    console.error("Fish.Audio Fetch Exception:", err);
-                    showModalAlert("Fish.Audio Network / CORS Error: " + err.message);
-                    updateStatusBadge(true);
-                    speakWebSpeech(text);
-                    return;
-                }
-            }
-
-            // DEFAULT: BROWSER NATIVE SPEECH
-            updateStatusBadge(false);
-            speakWebSpeech(text);
-        }
-
-        function testVoice() {
-            activeProvider = document.getElementById('voice-provider-select').value;
-            fishApiKey = document.getElementById('fish-key').value.trim();
-            fishVoiceId = document.getElementById('fish-voice').value.trim();
-            elevenApiKey = document.getElementById('eleven-key').value.trim();
-            elevenVoiceId = document.getElementById('eleven-voice').value.trim();
-            elevenModelId = document.getElementById('eleven-model').value;
-
-            clearModalAlert();
-            speakDealerText("Hello friend! Let's count cards to 21!");
-        }
-
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let recognition = null;
-        let isListening = false;
-
-        if (SpeechRecognition) {
-            recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = false;
-            recognition.lang = 'en-US';
-
-            recognition.onresult = (event) => {
-                const speech = event.results[event.results.length - 1][0].transcript.toLowerCase();
-                showSpeechBubble('"' + speech + '"');
-
-                if (speech.includes('card') || speech.includes('hit') || speech.includes('more') || speech.includes('please')) {
-                    playerHit();
-                } else if (speech.includes('stay') || speech.includes('stand') || speech.includes('stop') || speech.includes('no')) {
-                    playerStand();
-                } else if (speech.includes('again') || speech.includes('play') || speech.includes('deal') || speech.includes('start')) {
-                    startNewHand();
-                }
-            };
-        }
-
-        function toggleVoiceRecognition() {
-            if (!recognition) {
-                alert("Voice commands are supported in Chrome & Safari!");
-                return;
-            }
-
-            isListening = !isListening;
-            const label = document.getElementById('mic-label');
-            const icon = document.getElementById('mic-icon');
-
-            if (isListening) {
-                recognition.start();
-                label.textContent = "LISTENING NOW!";
-                icon.className = "fas fa-microphone-lines text-yellow-300 animate-bounce text-xl sm:text-2xl";
-                showSpeechBubble("Say 'Card' or 'Stay'!");
-                speakDealerText("I am listening! Say Card or Stay!");
-            } else {
-                recognition.stop();
-                label.textContent = "TALK TO DEALER";
-                icon.className = "fas fa-microphone text-xl sm:text-2xl";
-                hideSpeechBubble();
-            }
-        }
-
-        function showSpeechBubble(text) {
-            const bubble = document.getElementById('speech-bubble');
-            document.getElementById('speech-bubble-text').textContent = text;
-            bubble.classList.remove('opacity-0', 'pointer-events-none');
-        }
-
-        function hideSpeechBubble() {
-            document.getElementById('speech-bubble').classList.add('opacity-0', 'pointer-events-none');
-        }
-
-        const ANIMAL_CARDS = [
-            { name: 'Magic Ace', value: 11, emoji: '🦄', isAce: true },
-            { name: 'Two Bunny', value: 2, emoji: '🐰' },
-            { name: 'Three Kitty', value: 3, emoji: '🐱' },
-            { name: 'Four Puppy', value: 4, emoji: '🐶' },
-            { name: 'Five Frog', value: 5, emoji: '🐸' },
-            { name: 'Six Fox', value: 6, emoji: '🦊' },
-            { name: 'Seven Panda', value: 7, emoji: '🐼' },
-            { name: 'Eight Tiger', value: 8, emoji: '🐯' },
-            { name: 'Nine Lion', value: 9, emoji: '🦁' },
-            { name: 'Ten Monster', value: 10, emoji: '👾' },
-            { name: 'Jack Dragon', value: 10, emoji: '🐲' },
-            { name: 'Queen Unicorn', value: 10, emoji: '🦄' },
-            { name: 'King Bear', value: 10, emoji: '🐻' }
-        ];
-
-        let playerHand = [];
-        let dealerHand = [];
-        let stars = 10;
-        let inGame = false;
-
-        function drawRandomCard() {
-            const template = ANIMAL_CARDS[Math.floor(Math.random() * ANIMAL_CARDS.length)];
-            return { ...template };
-        }
-
-        function calculateScore(hand) {
-            let score = 0;
-            let aces = 0;
-
-            hand.forEach(card => {
-                score += card.value;
-                if (card.isAce) aces += 1;
-            });
-
-            while (score > 21 && aces > 0) {
-                score -= 10;
-                aces -= 1;
-            }
-
-            return score;
-        }
-
-        function renderCardHTML(card, container, hidden = false) {
-            const div = document.createElement('div');
-            div.className = 'kid-card' + (hidden ? '' : ' flipped');
-
-            const displayVal = card.isAce ? 'A' : card.value;
-
-            div.innerHTML = `
-                <div class="card-inner">
-                    <div class="card-back">
-                        <span class="text-3xl sm:text-4xl">⭐</span>
-                    </div>
-                    <div class="card-front p-2 flex flex-col justify-between items-center font-black">
-                        <span class="text-xl sm:text-2xl text-purple-600 self-start leading-none">${displayVal}</span>
-                        <span class="text-3xl sm:text-5xl">${card.emoji}</span>
-                        <span class="text-xl sm:text-2xl text-purple-600 self-end leading-none">${displayVal}</span>
-                    </div>
-                </div>
-            `;
-
-            container.appendChild(div);
-            playKidSound('pop');
-
-            if (!hidden) {
-                setTimeout(() => div.classList.add('flipped'), 50);
-            }
-        }
-
-        function updateMathHelper() {
-            if (playerHand.length === 0) {
-                document.getElementById('math-equation-text').textContent = '0 = 0';
-                return;
-            }
-
-            const values = playerHand.map(c => c.isAce ? '11/1' : c.value);
-            const total = calculateScore(playerHand);
-            document.getElementById('math-equation-text').textContent = values.join(' + ') + ' = ' + total;
-        }
-
-        function renderBoard() {
-            const pBox = document.getElementById('player-cards');
-            const dBox = document.getElementById('dealer-cards');
-
-            pBox.innerHTML = '';
-            dBox.innerHTML = '';
-
-            playerHand.forEach(c => renderCardHTML(c, pBox, false));
-            dealerHand.forEach(c => renderCardHTML(c, dBox, c.hidden));
-
-            const pScore = calculateScore(playerHand);
-            const dVisibleScore = calculateScore(dealerHand.filter(c => !c.hidden));
-
-            const pBadge = document.getElementById('player-score');
-            const dBadge = document.getElementById('dealer-score');
-
-            pBadge.textContent = 'Total: ' + pScore;
-            pBadge.classList.remove('hidden');
-
-            dBadge.textContent = 'Total: ' + dVisibleScore;
-            dBadge.classList.remove('hidden');
-
-            updateMathHelper();
-        }
-
-        function startNewHand() {
-            playerHand = [drawRandomCard(), drawRandomCard()];
-            
-            const hiddenCard = drawRandomCard();
-            hiddenCard.hidden = true;
-            dealerHand = [drawRandomCard(), hiddenCard];
-
-            inGame = true;
-
-            document.getElementById('btn-hit').classList.remove('hidden');
-            document.getElementById('btn-stand').classList.remove('hidden');
-            document.getElementById('btn-deal').classList.add('hidden');
-            hideBanner();
-
-            renderBoard();
-
-            const pScore = calculateScore(playerHand);
-
-            if (pScore === 21) {
-                playKidSound('win');
-                speakDealerText("WOW! Magic 21 Blackjack right away!");
-                endHand('WIN_21');
-            } else {
-                speakDealerText("Target is 21! Your card total is " + pScore + ". Want another card?");
-            }
-        }
-
-        function playerHit() {
-            if (!inGame) return;
-
-            const newCard = drawRandomCard();
-            playerHand.push(newCard);
-            renderBoard();
-
-            const score = calculateScore(playerHand);
-
-            if (score > 21) {
-                playKidSound('oops');
-                speakDealerText("Oh silly! You reached " + score + ". That went over 21!");
-                endHand('BUST');
-            } else if (score === 21) {
-                playKidSound('win');
-                speakDealerText("YES! Exactly 21! You win magic stars!");
-                endHand('WIN_21');
-            } else {
-                speakDealerText("You pulled " + newCard.value + "! New total is " + score + "! Want another?");
-            }
-        }
-
-        function playerStand() {
-            if (!inGame) return;
-
-            dealerHand[1].hidden = false;
-            renderBoard();
-
-            let dScore = calculateScore(dealerHand);
-            const pScore = calculateScore(playerHand);
-
-            speakDealerText("Flipping dealer card! Dealer total is " + dScore);
-
-            setTimeout(() => {
-                if (dScore < 17) {
-                    dealerHand.push(drawRandomCard());
-                    renderBoard();
-                    dScore = calculateScore(dealerHand);
-                }
-
-                if (dScore > 21 || pScore > dScore) {
-                    playKidSound('win');
-                    speakDealerText("Hooray! Your " + pScore + " beat " + dScore + "! You win stars!");
-                    endHand('WIN');
-                } else if (dScore === pScore) {
-                    speakDealerText("It is a tie at " + pScore + "! High five!");
-                    endHand('TIE');
-                } else {
-                    playKidSound('oops');
-                    speakDealerText("Dealer got " + dScore + " and won this round! Let's play again!");
-                    endHand('LOSE');
-                }
-            }, 1200);
-        }
-
-        function endHand(result) {
-            inGame = false;
-
-            const banner = document.getElementById('game-banner');
-            const title = document.getElementById('banner-title');
-            const subtitle = document.getElementById('banner-subtitle');
-
-            if (result === 'WIN_21') {
-                stars += 3;
-                title.textContent = "21! MAGIC 21! ⭐⭐⭐";
-                subtitle.textContent = "Perfect score of 21!";
-            } else if (result === 'WIN') {
-                stars += 1;
-                title.textContent = "YOU WIN STARS! ⭐";
-                subtitle.textContent = "Awesome counting to 21!";
-            } else if (result === 'TIE') {
-                title.textContent = "HIGH FIVE TIE! ✋";
-                subtitle.textContent = "Equal scores!";
-            } else {
-                title.textContent = "SO CLOSE! 🎈";
-                subtitle.textContent = "Let's play again to reach 21!";
-            }
-
-            document.getElementById('star-count').textContent = stars;
-            
-            banner.classList.remove('opacity-0', 'scale-90', 'pointer-events-none');
-            banner.classList.add('opacity-100', 'scale-100');
-
-            document.getElementById('btn-hit').classList.add('hidden');
-            document.getElementById('btn-stand').classList.add('hidden');
-            document.getElementById('btn-deal').classList.remove('hidden');
-        }
-
-        function hideBanner() {
-            const banner = document.getElementById('game-banner');
-            banner.classList.add('opacity-0', 'scale-90', 'pointer-events-none');
-            banner.classList.remove('opacity-100', 'scale-100');
-        }
-
-        window.onload = function() {
-            loadSavedSettings();
-            updateAvatarUI();
-            startNewHand();
-        };
-    </script>
+        toggleListening(false);
+      };
+
+      recognition.onerror = () => toggleListening(false);
+      recognition.onend = () => toggleListening(false);
+    }
+
+    function toggleListening(forceState) {
+      if (!recognition) {
+        alert("Speech recognition is not supported on this browser.");
+        return;
+      }
+      isListening = forceState !== undefined ? forceState : !isListening;
+      const btn = document.getElementById('mic-btn');
+      if (isListening) {
+        btn.classList.add('listening');
+        recognition.start();
+      } else {
+        btn.classList.remove('listening');
+        try { recognition.stop(); } catch(e){}
+      }
+    }
+
+    function toggleVoice() {
+      voiceEnabled = !voiceEnabled;
+      document.getElementById('voice-icon').textContent = voiceEnabled ? '🔊' : '🔇';
+    }
+
+    function openSettings() {
+      document.getElementById('settings-modal').style.display = 'flex';
+    }
+
+    function closeSettings() {
+      document.getElementById('settings-modal').style.display = 'none';
+    }
+
+    function testVoice() {
+      speak("Hello! I am Barnaby Bear! Let's play Monster Math 21 together!");
+    }
+  </script>
 </body>
 </html>
